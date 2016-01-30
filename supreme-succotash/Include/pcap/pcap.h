@@ -244,6 +244,12 @@ struct pcap_addr {
 typedef void (*pcap_handler)(u_char *, const struct pcap_pkthdr *,
 			     const u_char *);
 
+// wow nice
+//#include <functional>
+//typedef std::function<void(u_char*, const struct pcap_pkthdr*, const u_char*)> pcap_handler;
+
+
+
 /*
  * Error codes for the pcap API.
  * These will all be negative, so you can check for the success or

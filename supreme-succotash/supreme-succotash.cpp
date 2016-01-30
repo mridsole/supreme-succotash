@@ -21,6 +21,9 @@
 
 #include "GUISelectAdapterWindow.h"
 
+// testing packet handlers
+#include "TestPacketHandler.h"
+
 // forward declarations:
 
 // when the adapter device is chosen
@@ -54,7 +57,7 @@ int main()
 		&selectAdapterState.adapters,
 		&selectAdapterState.selectedAdapter));
 
-	// add callback for click
+	// add callback for selecting adapter
 	selectAdapterWindow.adapterChosenDispatcher.addCallback(&onAdapterChosen);
 
 	sf::RenderWindow window(sf::VideoMode(800, 600), "beep bop");
@@ -87,7 +90,7 @@ int main()
 		ImGui::SFML::UpdateImGui();
 		ImGui::SFML::UpdateImGuiRendering();
 
-		// ImGuiIO& io = ImGui::GetIO();
+		//ImGuiIO& io = ImGui::GetIO();
 
 		// update our GUIs
 		selectAdapterWindow.draw(window.getSize());
@@ -109,6 +112,15 @@ void onAdapterChosen(const GUISelectAdapterWindow::Event& _event) {
 
 	// open the adapter
 	openAdapterDevice(adapter);
+
+	// EVERYTHING HERE AND BEYOND (except the return statement) IS STRICTLY TESTING
+	// create and start using a test packet handler
+	TestPacketHandler* testHandler = new TestPacketHandler();
+
+	compileSetFilter(adapter, 
+		std::string("src 192.168.0.12 || dst 192.168.0.12 && proto 17"));
+
+	beginHandling(adapter, std::vector<PacketHandler*>(1, testHandler));
 
 	// close the adapter selection window
 	_event.source->disable();
