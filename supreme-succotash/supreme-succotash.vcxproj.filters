@@ -63,6 +63,9 @@
     <ClInclude Include="imgui\stb_truetype.h">
       <Filter>Source Files\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="GUISelectAdapterWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -79,6 +82,15 @@
     </ClCompile>
     <ClCompile Include="imgui\imgui_draw.cpp">
       <Filter>Source Files\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="GUISelectAdapterWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pcaputils.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pcaputils.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
