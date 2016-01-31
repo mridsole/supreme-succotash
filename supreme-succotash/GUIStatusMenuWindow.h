@@ -10,8 +10,11 @@
 #include "imgui/imgui-events-SFML.h"
 #include "imgui/imgui-rendering-SFML.h"
 
+#include "stdint.h"
+
 #include <vector>
 #include <string>
+#include <map>
 
 #include "pcaphandling.h"
 
@@ -46,10 +49,15 @@ public:
 
 		sf::Vector3f* clientPosition;
 		sf::Vector3f* clientRotation;
+		std::map<uint16_t, sf::Vector3f>* entityPositions;
 
-		State(sf::Vector3f* _clientPosition, sf::Vector3f* _clientRotation):
+		State(sf::Vector3f* _clientPosition,
+			sf::Vector3f* _clientRotation,
+			std::map<uint16_t, sf::Vector3f>* _entityPositions)
+			:
 			clientPosition(_clientPosition),
-			clientRotation(_clientRotation)
+			clientRotation(_clientRotation),
+			entityPositions(_entityPositions)
 		{}
 	};
 

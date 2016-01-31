@@ -19,6 +19,11 @@ public:
 	void handlePacket(uint8_t* param, const pcap_pkthdr* header,
 		const uint8_t* pkt_data);
 
+	std::map<uint16_t, sf::Vector3f> getEntityPositions() {
+
+		return entityPositions;
+	}
+
 	// Static functions for dealing with packets
 	static bool IsEntityPositionPacket(const uint8_t* pkt_data, uint32_t len);
 

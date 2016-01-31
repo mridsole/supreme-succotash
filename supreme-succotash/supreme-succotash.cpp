@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <vector>
 #include <functional>
+#include <map>
 
 #include "SFML/Graphics.hpp"
 
@@ -48,6 +49,7 @@ struct {
 
 	sf::Vector3f clientPosition;
 	sf::Vector3f clientRotation;
+	std::map<uint16_t, sf::Vector3f> entityPositions;
 } statusMenuState;
 
 // the status menu window
@@ -55,9 +57,16 @@ GUIStatusMenuWindow* statusMenuWindow;
 
 // handles client tick packets
 TickPacketHandler* tickPacketHandler = new TickPacketHandler();
+EntityPositionPacketHandler* entityPositionPacketHandler = new EntityPositionPacketHandler();
+
+std::vector<PacketHandler*> packetHandlers;
 
 int main()
 {
+	// which packet handlers we need
+	packetHandlers.push_back(tickPacketHandler);
+	packetHandlers.push_back(entityPositionPacketHandler);
+
 	// we need a frame update dispatcher to do much here
 	FrameUpdateDispatcher frameUpdateDispatcher;
 
@@ -81,7 +90,8 @@ int main()
 	// create the status menu window (after initializing it's state)
 	statusMenuWindow = new GUIStatusMenuWindow(GUIStatusMenuWindow::State(
 		&statusMenuState.clientPosition,
-		&statusMenuState.clientRotation
+		&statusMenuState.clientRotation,
+		&statusMenuState.entityPositions
 		));
 
 	// keep this disabled until we've chosen an adapter
@@ -122,10 +132,16 @@ int main()
 
 		// update position state for the menu window gui
 		statusMenuState.clientPosition = tickPacketHandler->getLastPlayerPosition();
+		statusMenuState.clientRotation = tickPacketHandler->getLastPlayerRotation();
+		statusMenuState.entityPositions = entityPositionPacketHandler->getEntityPositions();
 
 		// update our GUIs
 		selectAdapterWindow.draw(window.getSize());
 		statusMenuWindow->draw(window.getSize());
+
+		static int selectedEntity = 0;
+
+		//ImGui::ListBox("Entities", &selectedEntity, )
 
 		window.clear(sf::Color(20, 30, 40, 255));
 		ImGui::Render();
@@ -148,7 +164,7 @@ void onAdapterChosen(const GUISelectAdapterWindow::Event& _event) {
 	compileSetFilter(adapter, 
 		std::string("(src 192.168.0.12 || dst 192.168.0.12) && proto 17"));
 
-	beginHandling(adapter, std::vector<PacketHandler*>(1, tickPacketHandler));
+	beginHandling(adapter, packetHandlers);
 
 	// close the adapter selection window
 	_event.source->disable();

@@ -18,11 +18,18 @@ void GUIStatusMenuWindow::draw(const sf::Vector2u& windowSize) {
 
 	int winFlags = ImGuiWindowFlags_NoMove |
 		ImGuiWindowFlags_NoResize |
-		ImGuiWindowFlags_NoCollapse;
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoTitleBar;
 
 	// temp bool for state etc
 
 	ImGui::Begin("Status", &this->isEnabled, winFlags);
+
+	ImGui::Text("Status");
+
+	ImGui::Spacing();
+	ImGui::Spacing();
+	ImGui::Spacing();
 
 	ImGui::Text("You");
 
@@ -53,6 +60,30 @@ void GUIStatusMenuWindow::draw(const sf::Vector2u& windowSize) {
 	ImGui::Indent();
 	ImGui::Text(rotText);
 	ImGui::Unindent();
+
+	ImGui::Spacing();
+	ImGui::Spacing();
+	ImGui::Text("Entities");
+	ImGui::Separator();
+	ImGui::Spacing();
+
+	static int entitySelected = 0;
+
+	// we need to turn the uint16_t identifiers into a char**
+	char buf[10000];
+	char* buf2buf[1000];
+	int i = 0; int j = 0;
+
+	for (auto const &pair1 : *(state.entityPositions)) {
+
+		buf2buf[i] = buf + j;
+		j += sprintf(buf + j, "0x%.2x", pair1.first) + 1;
+
+		i++;
+	}
+
+	ImGui::ListBox("#EntitiesListBox", &entitySelected, (const char**)buf2buf,
+		state.entityPositions->size());
 
 	ImGui::SetWindowSize(ImVec2(180, windowSize.y - 40));
 	ImGui::SetWindowPos(ImVec2(20, 20));
