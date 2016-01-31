@@ -9,7 +9,7 @@
 #include "SFML/Graphics.hpp"
 
 // pcap utils
-#include "pcaputils.h"
+#include "pcaphandling.h"
 
 // imgui testing
 #include "imgui/imgui.h"
@@ -20,9 +20,12 @@
 #include "FrameUpdateDispatcher.h"
 
 #include "GUISelectAdapterWindow.h"
+#include "GUIStatusMenuWindow.h"
 
 // testing packet handlers
 #include "TestPacketHandler.h"
+#include "TickPacketHandler.h"
+#include "EntityPositionPacketHandler.h"
 
 // forward declarations:
 
@@ -32,7 +35,7 @@ void onAdapterChosen(const GUISelectAdapterWindow::Event& _event);
 // poll window events and store in the given vector
 int pollWindowEvents(sf::Window& window, std::vector<sf::Event>& events);
 
-// storage for selecting adapters
+// state storage for selecting adapters
 struct {
 
 	std::vector<AdapterDevice> adapters;
@@ -40,17 +43,30 @@ struct {
 
 } selectAdapterState;
 
+// state storage for the status menu
+struct {
+
+	sf::Vector3f clientPosition;
+	sf::Vector3f clientRotation;
+} statusMenuState;
+
+// the status menu window
+GUIStatusMenuWindow* statusMenuWindow;
+
+// handles client tick packets
+TickPacketHandler* tickPacketHandler = new TickPacketHandler();
+
 int main()
 {
-	// initialize some state
-	selectAdapterState.adapters = getAllAdapterDevices();
-	selectAdapterState.selectedAdapter = 0;
-
 	// we need a frame update dispatcher to do much here
 	FrameUpdateDispatcher frameUpdateDispatcher;
 
 	// the event to send to the update dispatcher each frame
 	FrameUpdateEvent frameUpdateEvent;
+
+	// initialize some state
+	selectAdapterState.adapters = getAllAdapterDevices();
+	selectAdapterState.selectedAdapter = 0;
 
 	// make the adapter selection window
 	GUISelectAdapterWindow selectAdapterWindow(GUISelectAdapterWindow::State(
@@ -60,7 +76,19 @@ int main()
 	// add callback for selecting adapter
 	selectAdapterWindow.adapterChosenDispatcher.addCallback(&onAdapterChosen);
 
-	sf::RenderWindow window(sf::VideoMode(800, 600), "beep bop");
+	// initialize state for status menu
+
+	// create the status menu window (after initializing it's state)
+	statusMenuWindow = new GUIStatusMenuWindow(GUIStatusMenuWindow::State(
+		&statusMenuState.clientPosition,
+		&statusMenuState.clientRotation
+		));
+
+	// keep this disabled until we've chosen an adapter
+	statusMenuWindow->disable();
+
+	sf::RenderWindow window(sf::VideoMode(800, 600), 
+		"Zuckles Removal Tool 7.1 Home Premium Edition", sf::Style::Close);
 
 	window.setFramerateLimit(60);
 
@@ -92,8 +120,12 @@ int main()
 
 		//ImGuiIO& io = ImGui::GetIO();
 
+		// update position state for the menu window gui
+		statusMenuState.clientPosition = tickPacketHandler->getLastPlayerPosition();
+
 		// update our GUIs
 		selectAdapterWindow.draw(window.getSize());
+		statusMenuWindow->draw(window.getSize());
 
 		window.clear(sf::Color(20, 30, 40, 255));
 		ImGui::Render();
@@ -113,17 +145,16 @@ void onAdapterChosen(const GUISelectAdapterWindow::Event& _event) {
 	// open the adapter
 	openAdapterDevice(adapter);
 
-	// EVERYTHING HERE AND BEYOND (except the return statement) IS STRICTLY TESTING
-	// create and start using a test packet handler
-	TestPacketHandler* testHandler = new TestPacketHandler();
-
 	compileSetFilter(adapter, 
-		std::string("src 192.168.0.12 || dst 192.168.0.12 && proto 17"));
+		std::string("(src 192.168.0.12 || dst 192.168.0.12) && proto 17"));
 
-	beginHandling(adapter, std::vector<PacketHandler*>(1, testHandler));
+	beginHandling(adapter, std::vector<PacketHandler*>(1, tickPacketHandler));
 
 	// close the adapter selection window
 	_event.source->disable();
+
+	// open the status menu window
+	statusMenuWindow->enable();
 }
 
 

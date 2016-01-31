@@ -152,9 +152,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodelockPacketHandler.h" />
+    <ClInclude Include="EntityPositionPacketHandler.h" />
     <ClInclude Include="EventDispatcher.h" />
     <ClInclude Include="FrameUpdateDispatcher.h" />
     <ClInclude Include="GUISelectAdapterWindow.h" />
+    <ClInclude Include="GUIStatusMenuWindow.h" />
     <ClInclude Include="imgui\imconfig-events-SFML.h" />
     <ClInclude Include="imgui\imconfig-rendering-SFML.h" />
     <ClInclude Include="imgui\imconfig.h" />
@@ -166,13 +168,17 @@
     <ClInclude Include="imgui\stb_textedit.h" />
     <ClInclude Include="imgui\stb_truetype.h" />
     <ClInclude Include="PacketHandler.h" />
+    <ClInclude Include="packetutils.h" />
+    <ClInclude Include="TickPacketHandler.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TestPacketHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CodelockPacketHandler.cpp" />
+    <ClCompile Include="EntityPositionPacketHandler.cpp" />
     <ClCompile Include="GUISelectAdapterWindow.cpp" />
+    <ClCompile Include="GUIStatusMenuWindow.cpp" />
     <ClCompile Include="imgui\imgui.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -186,10 +192,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="PacketHandler.cpp" />
-    <ClCompile Include="pcaputils.h">
+    <ClCompile Include="packetutils.cpp" />
+    <ClCompile Include="pcaphandling.h">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TickPacketHandler.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -197,9 +205,11 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="supreme-succotash.cpp" />
-    <ClCompile Include="pcaputils.cpp">
+    <ClCompile Include="pcaphandling.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="TestPacketHandler.cpp" />
   </ItemGroup>

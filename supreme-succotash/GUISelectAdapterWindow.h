@@ -13,7 +13,7 @@
 #include <vector>
 #include <string>
 
-#include "pcaputils.h"
+#include "pcaphandling.h"
 
 class GUISelectAdapterWindow
 {

@@ -1,11 +1,2 @@
-﻿  TestPacketHandler.cpp
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  supreme-succotash.cpp
-  PacketHandler.cpp
-  GUISelectAdapterWindow.cpp
-  pcaputils.cpp
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  pcaputils.h
+﻿  TickPacketHandler.cpp
   supreme-succotash.vcxproj -> E:\projects\supreme-succotash\Debug\supreme-succotash.exe

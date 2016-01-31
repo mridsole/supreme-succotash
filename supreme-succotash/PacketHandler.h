@@ -3,7 +3,7 @@
 #include "stdint.h"
 #include <thread>
 
-#include "pcaputils.h"
+#include "pcaphandling.h"
 
 // interface for responding to observed packets that match the filter
 class PacketHandler
@@ -19,18 +19,13 @@ public:
 
 	virtual ~PacketHandler() {};
 
-	virtual void startHandling(AdapterDevice&);
-	virtual void stopHandling();
+	virtual void onStartHandling();
+	virtual void onStopHandling();
 
 	virtual void handlePacket(uint8_t* param, const pcap_pkthdr* header, 
 		const uint8_t* pkt_data) = 0;
 
-	std::thread& getPcapLoopThread() { return this->pcapLoopThread; }
-
-	void useThreading(bool);
-
 	bool getIsHandling() const { return this->isHandling; }
-	bool getIsUsingThreading() const { return this->isUsingThreading; }
 
 private:
 
