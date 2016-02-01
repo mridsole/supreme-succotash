@@ -87,6 +87,9 @@
     <ClInclude Include="GUIStatusMenuWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Radar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -132,6 +135,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GUIStatusMenuWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Radar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

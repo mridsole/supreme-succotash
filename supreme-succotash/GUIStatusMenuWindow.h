@@ -18,15 +18,14 @@
 
 #include "pcaphandling.h"
 
+#include "EntityPositionPacketHandler.h"
+
 class GUIStatusMenuWindow
 {
 
 public:
 
-	enum class EventType
-	{
-		AdapterChosen
-	};
+	enum class EventType { AdapterChosen };
 
 	// sent in callbacks
 	struct Event {
@@ -49,15 +48,15 @@ public:
 
 		sf::Vector3f* clientPosition;
 		sf::Vector3f* clientRotation;
-		std::map<uint16_t, sf::Vector3f>* entityPositions;
+		EntityPositionPacketHandler::EntityMap* entities;
 
 		State(sf::Vector3f* _clientPosition,
 			sf::Vector3f* _clientRotation,
-			std::map<uint16_t, sf::Vector3f>* _entityPositions)
+			EntityPositionPacketHandler::EntityMap* _entities)
 			:
 			clientPosition(_clientPosition),
 			clientRotation(_clientRotation),
-			entityPositions(_entityPositions)
+			entities(_entities)
 		{}
 	};
 

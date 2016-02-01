@@ -41,7 +41,6 @@ void GUIStatusMenuWindow::draw(const sf::Vector2u& windowSize) {
 	// buffer for client position text
 	char posText[200];
 
-
 	sprintf(posText, "x: %f \ny: %f \nz: %f", 
 		state.clientPosition->x, state.clientPosition->y, state.clientPosition->z);
 
@@ -54,7 +53,7 @@ void GUIStatusMenuWindow::draw(const sf::Vector2u& windowSize) {
 	// buffer for client rotation text
 	char rotText[200];
 
-	sprintf(rotText, "x: %f \ny: %f \nz: %f",
+	sprintf(rotText, "p: %f \ny: %f \nr: %f",
 		state.clientRotation->x, state.clientRotation->y, state.clientRotation->z);
 
 	ImGui::Indent();
@@ -64,6 +63,7 @@ void GUIStatusMenuWindow::draw(const sf::Vector2u& windowSize) {
 	ImGui::Spacing();
 	ImGui::Spacing();
 	ImGui::Text("Entities");
+	ImGui::Spacing();
 	ImGui::Separator();
 	ImGui::Spacing();
 
@@ -71,19 +71,43 @@ void GUIStatusMenuWindow::draw(const sf::Vector2u& windowSize) {
 
 	// we need to turn the uint16_t identifiers into a char**
 	char buf[10000];
-	char* buf2buf[1000];
+	char* idStrings[1000];
 	int i = 0; int j = 0;
 
-	for (auto const &pair1 : *(state.entityPositions)) {
+	// (also while we're at it get the IDs themselves
+	uint16_t ids[1000];
 
-		buf2buf[i] = buf + j;
-		j += sprintf(buf + j, "0x%.2x", pair1.first) + 1;
+	for (auto const &pair1 : *(state.entities)) {
+
+		idStrings[i] = buf + j;
+		ids[i] = pair1.second.id;
+		j += sprintf(buf + j, "0x%.2x", pair1.second.id) + 1;
 
 		i++;
 	}
 
-	ImGui::ListBox("#EntitiesListBox", &entitySelected, (const char**)buf2buf,
-		state.entityPositions->size());
+	ImGui::Spacing();
+
+	// entities list
+	ImGui::Indent();
+	ImGui::ListBox("##EntitiesListBox", &entitySelected, (const char**)idStrings,
+		state.entities->size());
+
+	ImGui::Unindent();
+
+	// properties of selected entity
+	const auto& entity = (*state.entities)[ids[entitySelected]];
+
+	// (just position, for now)
+	char entPosText[200];
+
+	sprintf(entPosText, "x: %f \ny: %f \nz: %f",
+		entity.position.x, entity.position.y, entity.position.z);
+
+	ImGui::Indent();
+	ImGui::Text(entPosText);
+	ImGui::Unindent();
+
 
 	ImGui::SetWindowSize(ImVec2(180, windowSize.y - 40));
 	ImGui::SetWindowPos(ImVec2(20, 20));

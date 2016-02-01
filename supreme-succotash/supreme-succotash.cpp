@@ -12,14 +12,16 @@
 // pcap utils
 #include "pcaphandling.h"
 
-// imgui testing
+// imgui
 #include "imgui/imgui.h"
 #include "imgui/imgui-events-SFML.h"
 #include "imgui/imgui-rendering-SFML.h"
 
+// event dispatching
 #include "EventDispatcher.h"
 #include "FrameUpdateDispatcher.h"
 
+// gui markup
 #include "GUISelectAdapterWindow.h"
 #include "GUIStatusMenuWindow.h"
 
@@ -28,6 +30,9 @@
 #include "TickPacketHandler.h"
 #include "EntityPositionPacketHandler.h"
 
+// for rendering entity positions
+#include "Radar.h"
+
 // forward declarations:
 
 // when the adapter device is chosen
@@ -35,6 +40,7 @@ void onAdapterChosen(const GUISelectAdapterWindow::Event& _event);
 
 // poll window events and store in the given vector
 int pollWindowEvents(sf::Window& window, std::vector<sf::Event>& events);
+
 
 // state storage for selecting adapters
 struct {
@@ -49,7 +55,8 @@ struct {
 
 	sf::Vector3f clientPosition;
 	sf::Vector3f clientRotation;
-	std::map<uint16_t, sf::Vector3f> entityPositions;
+	TickPacketHandler::ClientState clientState;
+	EntityPositionPacketHandler::EntityMap entities;
 } statusMenuState;
 
 // the status menu window
@@ -59,7 +66,11 @@ GUIStatusMenuWindow* statusMenuWindow;
 TickPacketHandler* tickPacketHandler = new TickPacketHandler();
 EntityPositionPacketHandler* entityPositionPacketHandler = new EntityPositionPacketHandler();
 
+// pointers to all our packet handlers
 std::vector<PacketHandler*> packetHandlers;
+
+// draws the stuff
+Radar* radar;
 
 int main()
 {
@@ -91,11 +102,25 @@ int main()
 	statusMenuWindow = new GUIStatusMenuWindow(GUIStatusMenuWindow::State(
 		&statusMenuState.clientPosition,
 		&statusMenuState.clientRotation,
-		&statusMenuState.entityPositions
+		&statusMenuState.entities
 		));
 
 	// keep this disabled until we've chosen an adapter
 	statusMenuWindow->disable();
+
+	// initialize the radar
+	Radar::State radarState = Radar::State(&statusMenuState.entities, &statusMenuState.clientState);
+	Radar::Config radarConfig;
+	radarConfig.clientColor = sf::Color(60, 200, 60, 255);
+	radarConfig.entityColor = sf::Color(200, 60, 60, 255);
+	radarConfig.clientRadius = 10.f;
+	radarConfig.entityRadius = 10.f;
+	radarConfig.scale = 1.f;
+
+	radar = new Radar(radarState, radarConfig);
+
+	// disable the radar for now
+	radar->disable();
 
 	sf::RenderWindow window(sf::VideoMode(800, 600), 
 		"Zuckles Removal Tool 7.1 Home Premium Edition", sf::Style::Close);
@@ -124,16 +149,18 @@ int main()
 
 		frameUpdateDispatcher.fire(frameUpdateEvent);
 
+		// update position state for the menu window gui
+		statusMenuState.clientPosition = tickPacketHandler->getLastPlayerPosition();
+		statusMenuState.clientRotation = tickPacketHandler->getLastPlayerRotation();
+		statusMenuState.clientState = tickPacketHandler->getClientState();
+		statusMenuState.entities = entityPositionPacketHandler->getEntities();
+
+
 		// IMGUI
 		ImGui::SFML::UpdateImGui();
 		ImGui::SFML::UpdateImGuiRendering();
 
 		//ImGuiIO& io = ImGui::GetIO();
-
-		// update position state for the menu window gui
-		statusMenuState.clientPosition = tickPacketHandler->getLastPlayerPosition();
-		statusMenuState.clientRotation = tickPacketHandler->getLastPlayerRotation();
-		statusMenuState.entityPositions = entityPositionPacketHandler->getEntityPositions();
 
 		// update our GUIs
 		selectAdapterWindow.draw(window.getSize());
@@ -144,7 +171,13 @@ int main()
 		//ImGui::ListBox("Entities", &selectedEntity, )
 
 		window.clear(sf::Color(20, 30, 40, 255));
+
+		// draw the radar
+		radar->draw(window, sf::RenderStates::Default);
+
+		// render IMGUI
 		ImGui::Render();
+
 		window.display();
 	}
 
@@ -162,7 +195,7 @@ void onAdapterChosen(const GUISelectAdapterWindow::Event& _event) {
 	openAdapterDevice(adapter);
 
 	compileSetFilter(adapter, 
-		std::string("(src 192.168.0.12 || dst 192.168.0.12) && proto 17"));
+		std::string("(src 192.168.1.7 || dst 192.168.1.7) && proto 17"));
 
 	beginHandling(adapter, packetHandlers);
 
@@ -171,6 +204,9 @@ void onAdapterChosen(const GUISelectAdapterWindow::Event& _event) {
 
 	// open the status menu window
 	statusMenuWindow->enable();
+	
+	// enable the radar
+	radar->enable();
 }
 
 

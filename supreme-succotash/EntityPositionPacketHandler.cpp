@@ -4,7 +4,9 @@
 #include "stdio.h"
 
 EntityPositionPacketHandler::EntityPositionPacketHandler():
-	entityPositions()
+	entities(),
+	howOftenToPrune(5000),
+	pruneAfter(500)
 {
 }
 
@@ -15,6 +17,9 @@ EntityPositionPacketHandler::~EntityPositionPacketHandler()
 
 void EntityPositionPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr* header,
 	const uint8_t* pkt_data) {
+
+	// number of position update packets since last prune
+	static unsigned int packetCount = 0;
 
 	if (!EntityPositionPacketHandler::IsEntityPositionPacket(pkt_data, header->len)) 
 		return;
@@ -28,14 +33,33 @@ void EntityPositionPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr
 
 	// if the given id doesn't exist make an entry for it and store the pos
 	// otherwise update the existing pos
-	if (entityPositions.find(entityID) == entityPositions.end()) {
+	if (entities.find(entityID) == entities.end()) {
 
-		entityPositions.insert(std::pair<uint16_t, sf::Vector3f>(entityID, sf::Vector3f(x, y, z)));
+		entities.insert( std::pair<uint16_t, Entity>(entityID, Entity(entityID, x, y, z)) );
+
 	} else {
 
-		entityPositions[entityID].x = x;
-		entityPositions[entityID].y = y;
-		entityPositions[entityID].z = z;
+		entities[entityID].position.x = x;
+		entities[entityID].position.y = y;
+		entities[entityID].position.z = z;
+
+		// set prune counter to zero
+		entities[entityID].packetsSinceObserved = 0;
+	}
+
+	// increment prune counter for all entities 
+	for (auto& pair : entities) {
+
+		pair.second.packetsSinceObserved++;
+	}
+
+	packetCount++;
+
+	// if we due for a prune then do it
+	if (packetCount >= howOftenToPrune) {
+
+		pruneEntities();
+		packetCount = 0;
 	}
 }
 
@@ -46,4 +70,28 @@ bool EntityPositionPacketHandler::IsEntityPositionPacket(
 		return true;
 
 	return false;
+}
+
+// stop tracking entities we haven't observed for a while
+unsigned int EntityPositionPacketHandler::pruneEntities() {
+
+	unsigned int entitiesPruned = 0;
+
+	EntityMap::iterator it = entities.begin();
+
+	while (it != entities.end()) {
+
+		if (it->second.packetsSinceObserved >= pruneAfter) {
+
+			EntityMap::iterator it_next;
+			it = entities.erase(it);
+			entitiesPruned++;
+
+		} else {
+
+			it++;
+		}
+	}
+
+	return entitiesPruned;
 }

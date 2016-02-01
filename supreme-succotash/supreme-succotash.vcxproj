@@ -170,6 +170,7 @@
     <ClInclude Include="imgui\stb_truetype.h" />
     <ClInclude Include="PacketHandler.h" />
     <ClInclude Include="packetutils.h" />
+    <ClInclude Include="Radar.h" />
     <ClInclude Include="TickPacketHandler.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -198,6 +199,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Radar.cpp" />
     <ClCompile Include="TickPacketHandler.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

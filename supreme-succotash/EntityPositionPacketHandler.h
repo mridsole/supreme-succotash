@@ -13,15 +13,35 @@ class EntityPositionPacketHandler : public PacketHandler
 
 public:
 
+	// representation of entity
+	struct Entity {
+
+		uint16_t id;
+		sf::Vector3f position;
+
+		unsigned int packetsSinceObserved;
+
+		Entity(uint16_t _id, float x, float y, float z) :
+			id(_id),
+			position(x, y, z),
+			packetsSinceObserved(0)
+		{}
+
+		// shouldn't be used but throws errors otherwise?
+		Entity() {};
+	};
+
+	using EntityMap = std::map<uint16_t, Entity>;
+
 	EntityPositionPacketHandler();
 	~EntityPositionPacketHandler();
 
 	void handlePacket(uint8_t* param, const pcap_pkthdr* header,
 		const uint8_t* pkt_data);
 
-	std::map<uint16_t, sf::Vector3f> getEntityPositions() {
+	EntityMap getEntities() {
 
-		return entityPositions;
+		return entities;
 	}
 
 	// Static functions for dealing with packets
@@ -29,6 +49,15 @@ public:
 
 private:
 
-	// construct map of all entities. should really do this elsewhere!
-	std::map<uint16_t, sf::Vector3f> entityPositions;
+	unsigned int pruneEntities();
+
+	// map all observed entities by their ID
+	EntityMap entities;
+
+	// every this many packets, remove entities that haven't been observed for a while
+	unsigned int howOftenToPrune;
+
+	// how many entity position update packets must happen where a given entity
+	// has not been observed for it to be pruned
+	unsigned int pruneAfter;
 };

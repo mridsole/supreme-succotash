@@ -7,7 +7,7 @@
 #include "stdio.h"
 
 TickPacketHandler::TickPacketHandler() :
-	lastPlayerPosition(), lastPlayerRotation()
+	clientState()
 {}
 
 TickPacketHandler::~TickPacketHandler()
@@ -29,9 +29,9 @@ void TickPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr* header,
 	float y = *((float*)(vec3_1_start + 8));
 	float z = *((float*)(vec3_1_start + 13));
 
-	this->lastPlayerRotation.x = x;
-	this->lastPlayerRotation.y = y;
-	this->lastPlayerRotation.z = z;
+	clientState.rotation.x = x;
+	clientState.rotation.y = y;
+	clientState.rotation.z = z;
 
 	// find the second vec3
 	auto vec3_2_start = std::search(vec3_1_start + 3, pkt_data + header->len,
@@ -41,15 +41,15 @@ void TickPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr* header,
 	y = *((float*)(vec3_2_start + 8));
 	z = *((float*)(vec3_2_start + 13));
 
-	this->lastPlayerPosition.x = x;
-	this->lastPlayerPosition.y = y;
-	this->lastPlayerPosition.z = z;
+	clientState.position.x = x;
+	clientState.position.y = y;
+	clientState.position.z = z;
 }
 
 
 bool TickPacketHandler::IsTickPacket(const uint8_t* pkt_data, uint32_t len) {
 
-	if ((len == 162 || len == 163) && pkt_data[69] == 0x9b)
+	if ((len >= 162 && len <= 180) && pkt_data[69] == 0x9b)
 		return true;
 
 	return false;
