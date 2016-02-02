@@ -32,7 +32,7 @@ public:
 		float entityRadius;
 		sf::Color entityColor;
 
-		// ratio of pixels to ingame units
+		// ingame units to pixels
 		float scale;
 
 		Config(float _clientRadius, sf::Color _clientColor,
@@ -64,6 +64,15 @@ public:
 
 
 private:
+
+	sf::CircleShape getEntityCircle(const EntityPositionPacketHandler::Entity& entity,
+		sf::Vector2f& screenSize) const;
+
+	sf::CircleShape getClientCircle(TickPacketHandler::ClientState& client,
+		sf::Vector2f& screenSize) const;
+
+	sf::VertexArray getClientViewLine(TickPacketHandler::ClientState& client,
+		sf::Vector2f& screenSize) const;
 
 	State state;
 	Config config;

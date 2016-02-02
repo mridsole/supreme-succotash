@@ -113,8 +113,8 @@ int main()
 	Radar::Config radarConfig;
 	radarConfig.clientColor = sf::Color(60, 200, 60, 255);
 	radarConfig.entityColor = sf::Color(200, 60, 60, 255);
-	radarConfig.clientRadius = 10.f;
-	radarConfig.entityRadius = 10.f;
+	radarConfig.clientRadius = 5.f;
+	radarConfig.entityRadius = 5.f;
 	radarConfig.scale = 1.f;
 
 	radar = new Radar(radarState, radarConfig);
