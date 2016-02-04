@@ -153,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodelockPacketHandler.h" />
+    <ClInclude Include="EntitiesPacketHandler.h" />
     <ClInclude Include="EntityPositionPacketHandler.h" />
     <ClInclude Include="EventDispatcher.h" />
     <ClInclude Include="FrameUpdateDispatcher.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="imgui\stb_truetype.h" />
     <ClInclude Include="PacketHandler.h" />
     <ClInclude Include="packetutils.h" />
+    <ClInclude Include="protobufutils.h" />
     <ClInclude Include="Radar.h" />
     <ClInclude Include="TickPacketHandler.h" />
     <ClInclude Include="stdafx.h" />
@@ -178,6 +180,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CodelockPacketHandler.cpp" />
+    <ClCompile Include="EntitiesPacketHandler.cpp" />
     <ClCompile Include="EntityPositionPacketHandler.cpp" />
     <ClCompile Include="GUISelectAdapterWindow.cpp" />
     <ClCompile Include="GUIStatusMenuWindow.cpp" />
@@ -199,6 +202,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="protobufutils.cpp" />
     <ClCompile Include="Radar.cpp" />
     <ClCompile Include="TickPacketHandler.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -217,6 +221,7 @@
     <ClCompile Include="TestPacketHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram.cd" />
     <None Include="imgui\LICENSE" />
     <None Include="imgui\README.md" />
   </ItemGroup>

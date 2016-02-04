@@ -35,3 +35,5 @@ uint16_t checksum_ip(const uint16_t* ipheader);
 uint16_t udp_sum_calc(uint16_t len_udp, uint8_t* src_addr, uint8_t* dest_addr,
 	int padding, uint8_t* buff);
 uint32_t crc32(uint32_t crc, const void *buf, size_t size);
+
+// some things for dealing with protobufs

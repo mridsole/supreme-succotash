@@ -108,6 +108,11 @@ void GUIStatusMenuWindow::draw(const sf::Vector2u& windowSize) {
 	ImGui::Text(entPosText);
 	ImGui::Unindent();
 
+	ImGui::Spacing();
+	ImGui::Spacing();
+	ImGui::Text("Scale");
+	ImGui::Spacing();
+	ImGui::SliderFloat("##Scale", state.scale, 0.5, 2);
 
 	ImGui::SetWindowSize(ImVec2(180, windowSize.y - 40));
 	ImGui::SetWindowPos(ImVec2(20, 20));

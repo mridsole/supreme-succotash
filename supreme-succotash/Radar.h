@@ -58,6 +58,10 @@ public:
 		config = _config;
 	}
 
+	void setScale(float _scale) {
+		config.scale = _scale;
+	}
+
 	bool isEnabled() { return enabled; }
 	void enable() { enabled = true; }
 	void disable() { enabled = false; }
@@ -79,5 +83,8 @@ private:
 
 	// should draw?
 	bool enabled;
+
+	// the font to use (just use proggyclean for now)
+	sf::Font font;
 };
 

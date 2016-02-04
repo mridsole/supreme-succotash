@@ -57,6 +57,7 @@ struct {
 	sf::Vector3f clientRotation;
 	TickPacketHandler::ClientState clientState;
 	EntityPositionPacketHandler::EntityMap entities;
+	float scale;
 } statusMenuState;
 
 // the status menu window
@@ -88,6 +89,8 @@ int main()
 	selectAdapterState.adapters = getAllAdapterDevices();
 	selectAdapterState.selectedAdapter = 0;
 
+	statusMenuState.scale = 1.f;
+
 	// make the adapter selection window
 	GUISelectAdapterWindow selectAdapterWindow(GUISelectAdapterWindow::State(
 		&selectAdapterState.adapters,
@@ -102,7 +105,8 @@ int main()
 	statusMenuWindow = new GUIStatusMenuWindow(GUIStatusMenuWindow::State(
 		&statusMenuState.clientPosition,
 		&statusMenuState.clientRotation,
-		&statusMenuState.entities
+		&statusMenuState.entities,
+		&statusMenuState.scale
 		));
 
 	// keep this disabled until we've chosen an adapter
@@ -174,6 +178,8 @@ int main()
 
 		// draw the radar
 		radar->draw(window, sf::RenderStates::Default);
+		// and set it's scale
+		radar->setScale(statusMenuState.scale);
 
 		// render IMGUI
 		ImGui::Render();

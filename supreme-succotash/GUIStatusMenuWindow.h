@@ -50,13 +50,18 @@ public:
 		sf::Vector3f* clientRotation;
 		EntityPositionPacketHandler::EntityMap* entities;
 
+		// sending info back
+		float* scale;
+
 		State(sf::Vector3f* _clientPosition,
 			sf::Vector3f* _clientRotation,
-			EntityPositionPacketHandler::EntityMap* _entities)
+			EntityPositionPacketHandler::EntityMap* _entities,
+			float* _scale)
 			:
 			clientPosition(_clientPosition),
 			clientRotation(_clientRotation),
-			entities(_entities)
+			entities(_entities),
+			scale(_scale)
 		{}
 	};
 

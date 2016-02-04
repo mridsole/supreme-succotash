@@ -6,10 +6,13 @@
 #define DEG_2_RAD 0.0174533
 
 Radar::Radar(Radar::State _state, Radar::Config _config):
-	state(_state),
+	state(_state), 
 	config(_config), 
-	enabled(true)
-{}
+	enabled(true),
+	font()
+{
+	font.loadFromFile("proggyclean.ttf");
+}
 
 
 Radar::~Radar()
@@ -24,7 +27,16 @@ void Radar::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 	// render a circle for all entities
 	for (const auto& pair : *state.entities) {
 
-		target.draw(getEntityCircle(pair.second, screenSize));
+		sf::CircleShape entCircle = getEntityCircle(pair.second, screenSize);
+		target.draw(entCircle);
+
+		// also draw the ID of the entity next to it
+		char entIDStr[100]; sprintf(entIDStr, "0x%.4x", pair.second.id);
+		sf::Text idText = sf::Text(sf::String(entIDStr), font, 14);
+
+		idText.setPosition(sf::Vector2f(entCircle.getPosition().x + 15, entCircle.getPosition().y));
+		idText.setColor(sf::Color(255, 255, 255, 255));
+		target.draw(idText);
 	}
 
 	// render a line pointing in the client's view direction

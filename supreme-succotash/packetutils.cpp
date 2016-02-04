@@ -261,3 +261,6 @@ uint32_t getUDPLength(const uint8_t* packetStart) {
 
 	return (uint32_t)udpLength16;
 }
+
+
+#include "assert.h"
