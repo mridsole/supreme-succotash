@@ -26,6 +26,32 @@ void BaseNetworkable::deserializeLengthDelimited(Stream& stream) {
 	this->deserialize(stream);
 }
 
+void BaseEntity::deserializeLengthDelimited(Stream& stream) {
+
+	Deserializable::deserializeLengthDelimited(stream);
+
+	uint32_t len = readVarint32(stream);
+	uint8_t const * start = stream.bytes;
+
+	while (stream.bytes - start < len) {
+
+		uint32_t type = readByte(stream);
+
+		if (type == 10) {
+			this->pos = readVector3f(stream);
+
+		} else if (type == 18) {
+			this->rot = readVector3f(stream);
+
+		} else if (type == 24) {
+			this->flags = readVarint64(stream);
+
+		} else if (type == 32) {
+
+			this->skin = readVarint64(stream);
+		}
+	}
+}
 
 // DON'T USE THIS YET
 void BasePlayer::deserialize(Stream& stream) {
@@ -61,8 +87,7 @@ void BasePlayer::deserializeLengthDelimited(Stream& stream) {
 
 	// read the length
 	uint32_t len = readVarint32(stream);
-
-	const uint8_t* start = stream.bytes;
+	uint8_t const * start = stream.bytes;
 
 	while (stream.bytes - start < len) {
 
@@ -112,6 +137,9 @@ void Entity::deserialize(Stream& stream) {
 
 		if (entType == (int32_t)10) {
 			this->baseNetworkable.deserializeLengthDelimited(stream);
+
+		} else if (entType == (int32_t)18) {
+			this->baseEntity.deserializeLengthDelimited(stream);
 
 		} else if (entType == (int32_t)26) {
 			this->basePlayer.deserializeLengthDelimited(stream);

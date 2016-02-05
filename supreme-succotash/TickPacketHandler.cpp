@@ -36,7 +36,7 @@ void TickPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr* header,
 
 bool TickPacketHandler::IsTickPacket(const uint8_t* pkt_data, uint32_t len) {
 
-	if ((len >= 158 && len <= 180) && pkt_data[69] == 0x9b)
+	if ((len >= 156 && len <= 180) && pkt_data[69] == 0x9b)
 		return true;
 
 	return false;

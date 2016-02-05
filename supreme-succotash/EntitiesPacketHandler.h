@@ -24,7 +24,7 @@ public:
 	void handlePacket(uint8_t* param, const pcap_pkthdr* header,
 		const uint8_t* pkt_data);
 
-	void updateEntity(const deserialize::Entity entityDeserializer);
+	void updateEntity(const deserialize::Entity& entityDeserializer);
 
 
 	static bool isEntitiesPacket(uint8_t* param, const pcap_pkthdr* header,

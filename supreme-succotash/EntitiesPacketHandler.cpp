@@ -21,8 +21,6 @@ void EntitiesPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr* head
 	if (!isEntitiesPacket(param, header, pkt_data))
 		return;
 
-	printf("entities packet received ...\n");
-
 	// bit of a hacky way of doing it but basically search for 0a 0d 08,
 	// which occurs at all the packets that we're interested in and identifies
 	// the start of the serialized entity
@@ -48,22 +46,19 @@ void EntitiesPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr* head
 		advance(stream, nextEntity - stream.bytes);
 
 		// deserialize it
+		entityDeserializer.reset();
 		entityDeserializer.deserialize(stream);
 
 		// if we got a BasePlayer from it, print out the stats
 		if (entityDeserializer.baseNetworkable.hasSerialized() &&
 			entityDeserializer.basePlayer.hasSerialized()) {
 
-			printf("Got a player, id: %.8x - name: %s\n",
-				entityDeserializer.baseNetworkable.uid,
-				entityDeserializer.basePlayer.name);
-
 			updateEntity(entityDeserializer);
 		}
 	}
 }
 
-void EntitiesPacketHandler::updateEntity(const deserialize::Entity entityDeserializer) {
+void EntitiesPacketHandler::updateEntity(const deserialize::Entity& entityDeserializer) {
 
 	uint32_t uid = entityDeserializer.baseNetworkable.uid;
 	uint8_t const * name = entityDeserializer.basePlayer.name;
@@ -73,15 +68,36 @@ void EntitiesPacketHandler::updateEntity(const deserialize::Entity entityDeseria
 	// which we currently don't deserialize
 
 	EntityMap::iterator it = entityMap->find(uid);
-	
+
 	// found something
 	if (it != entityMap->end()) {
 
 		Entity& ent = it->second;
-		
-		if (!ent.hasName)
+
+		if (!ent.hasName) {
+
 			ent.name.assign((char const *)name);
+			ent.hasName = true;
+		}
+	} else {
+
+		float x = entityDeserializer.baseEntity.pos.x;
+		float y = entityDeserializer.baseEntity.pos.y;
+		float z = entityDeserializer.baseEntity.pos.z;
+
+		// create something
+		auto pair = std::pair<uint32_t, Entity>(uid, Entity(uid, x, y, z));
+		pair.second.rotation = entityDeserializer.baseEntity.rot;
+		
+		pair.second.hasName = true;
+		pair.second.name.assign((char const *)name);
+
+		printf("wrote player name: %s\n", pair.second.name.c_str());
+
+		entityMap->insert(pair);
 	}
+
+	printf("Got a player, id: %.8x - name: %s\n", uid, name);
 }
 
 
@@ -94,4 +110,3 @@ bool EntitiesPacketHandler::isEntitiesPacket(uint8_t* param, const pcap_pkthdr* 
 
 	return false;
 }
-

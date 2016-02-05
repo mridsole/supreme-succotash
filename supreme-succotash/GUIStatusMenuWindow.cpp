@@ -23,7 +23,7 @@ void GUIStatusMenuWindow::draw(const sf::Vector2u& windowSize) {
 
 	// temp bool for state etc
 
-	ImGui::Begin("Status", &this->isEnabled, winFlags);
+	ImGui::Begin("Status", &this->isEnabled, ImVec2(0, 0), 0.3f, winFlags);
 
 	ImGui::Text("Status");
 
@@ -95,18 +95,21 @@ void GUIStatusMenuWindow::draw(const sf::Vector2u& windowSize) {
 
 	ImGui::Unindent();
 
-	// properties of selected entity
-	const auto& entity = (*state.entities)[ids[entitySelected]];
+	if (state.entities->size() > 0) {
 
-	// (just position, for now)
-	char entPosText[200];
+		// properties of selected entity
+		const auto& entity = (*state.entities)[ids[entitySelected]];
 
-	sprintf(entPosText, "x: %f \ny: %f \nz: %f",
-		entity.position.x, entity.position.y, entity.position.z);
+		// (just position, for now)
+		char entPosText[200];
 
-	ImGui::Indent();
-	ImGui::Text(entPosText);
-	ImGui::Unindent();
+		sprintf(entPosText, "x: %f \ny: %f \nz: %f",
+			entity.position.x, entity.position.y, entity.position.z);
+
+		ImGui::Indent();
+		ImGui::Text(entPosText);
+		ImGui::Unindent();
+	}
 
 	ImGui::Spacing();
 	ImGui::Spacing();

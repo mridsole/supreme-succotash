@@ -57,6 +57,27 @@ public:
 	}
 };
 
+class BaseEntity : public Deserializable {
+
+public:
+
+	// DATA
+	Vector3f pos;
+	Vector3f rot;
+	int flags;
+	int skin;
+
+	BaseEntity() {};
+	~BaseEntity() {};
+
+	virtual void deserializeLengthDelimited(Stream& stream);
+
+	virtual void reset() {
+
+		Deserializable::reset();
+	}
+};
+
 class BasePlayer : public Deserializable {
 
 public:
@@ -103,6 +124,7 @@ class Entity : public Deserializable
 public:
 
 	BaseNetworkable baseNetworkable;
+	BaseEntity baseEntity;
 	BasePlayer basePlayer;
 
 	bool createdThisFrame;
@@ -117,6 +139,7 @@ public:
 		Deserializable::reset();
 
 		baseNetworkable.reset();
+		baseEntity.reset();
 		basePlayer.reset();
 	}
 

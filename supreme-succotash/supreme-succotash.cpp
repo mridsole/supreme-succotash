@@ -88,15 +88,17 @@ int main()
 	// TESTING
 
 	// load in a test packet
-	FILE* fileptr = fopen("testdata/newticktest", "rb");
-	fseek(fileptr, 0, SEEK_END);
-	size_t len = ftell(fileptr);
-	rewind(fileptr);
+	//FILE* fileptr = fopen("testdata/entitiesnew", "rb");
+	//fseek(fileptr, 0, SEEK_END);
+	//size_t len = ftell(fileptr);
+	//rewind(fileptr);
 
-	uint8_t data[2000];
-	fread(data, len, 1, fileptr);
+	//uint8_t data[2000];
+	//fread(data, len, 1, fileptr);
 
-	testTickPacket(data, len);
+	//testEntitiesPacket(data, len);
+
+	//testEntityPositionPacket(data, len);
 
 	// END TESTING
 
@@ -276,7 +278,7 @@ void testEntitiesPacket(const uint8_t* pkt_data, size_t len) {
 	// of the base networkable, the 08 is the first byte written by the base networkable
 	constexpr uint8_t searchFor[] = { 0x0a, 0x0c, 0x08 };
 
-	while (stream.bytes - stream.bytesStart < stream.len - 4) {
+	while (stream.bytes - stream.bytesStart < (int)stream.len - 4) {
 
 		// reset the deserializer
 		entityDeserializer.reset();

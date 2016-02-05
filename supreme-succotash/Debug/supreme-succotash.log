@@ -1,2 +1,3 @@
-﻿Debug\pcaphandling.obj : warning LNK4042: object specified more than once; extras ignored
+﻿  GUIStatusMenuWindow.cpp
+e:\projects\supreme-succotash\supreme-succotash\guistatusmenuwindow.cpp(120): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
   supreme-succotash.vcxproj -> E:\projects\supreme-succotash\Debug\supreme-succotash.exe

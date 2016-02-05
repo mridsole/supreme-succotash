@@ -91,7 +91,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;HAVE_REMOTE;_WINSOCKAPI_;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HAVE_REMOTE;_WINSOCKAPI_;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>E:\projects\libraries\SFML-2.3.2\include;E:\projects\libraries\SFGUI-0.3.0\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -120,7 +120,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;HAVE_REMOTE;_WINSOCKAPI_;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;HAVE_REMOTE;_WINSOCKAPI_;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>E:\projects\libraries\SFML-2.3.2\include;E:\projects\libraries\SFGUI-0.3.0\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
