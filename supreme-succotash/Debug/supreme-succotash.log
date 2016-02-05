@@ -1,3 +1,4 @@
-﻿  GUIStatusMenuWindow.cpp
-e:\projects\supreme-succotash\supreme-succotash\guistatusmenuwindow.cpp(120): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
+﻿  supreme-succotash.cpp
+  EntitiesPacketHandler.cpp
+  Generating Code...
   supreme-succotash.vcxproj -> E:\projects\supreme-succotash\Debug\supreme-succotash.exe

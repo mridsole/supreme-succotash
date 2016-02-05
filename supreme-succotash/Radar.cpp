@@ -33,15 +33,8 @@ void Radar::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		// also draw the ID of the entity next to it
 		char entStr[512]; sprintf(entStr, "0x%.8x\n", pair.second.id);
 		
-		static bool b = false;
-		if (pair.second.hasName) {
-
-			strcpy(entStr + strlen(entStr), pair.second.name.c_str());
-			if (!b) {
-				printf("%s\n", entStr);
-				b = true;
-			}
-		}
+		if (pair.second.hasName)
+			strcat(entStr, pair.second.name.c_str());
 
 		sf::Text idText = sf::Text(sf::String(entStr), font, 14);
 

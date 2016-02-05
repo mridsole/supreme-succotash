@@ -33,25 +33,36 @@ void EntitiesPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr* head
 
 	// NOTE: the 0a is the start of a base networkable - the 0c is the length
 	// of the base networkable, the 08 is the first byte written by the base networkable
-	constexpr uint8_t searchFor[] = { 0x0a, 0x0c, 0x08 };
+	constexpr uint8_t searchFor1[] = { 0x0a, 0x0c, 0x08 };
+	constexpr uint8_t searchFor2[] = { 0x0a, 0x0d, 0x08 };
 
-	while (stream.bytes - stream.bytesStart < stream.len - 4) {
+	while (stream.bytes - stream.bytesStart < (int)stream.len - 4) {
+
+		// reset the deserializer
+		entityDeserializer.reset();
 
 		// advance to the next entity
-		uint8_t const * nextEntity = std::search(stream.bytes, stream.bytesEnd,
-			searchFor, searchFor + 3);
+		uint8_t const * nextEntity1 = std::search(stream.bytes, stream.bytesEnd,
+			searchFor1, searchFor1 + 3);
+		uint8_t const * nextEntity2 = std::search(stream.bytes, stream.bytesEnd,
+			searchFor2, searchFor2 + 3);
 
-		if (nextEntity == stream.bytesEnd) break;
+		if (nextEntity1 == stream.bytesEnd &&
+			nextEntity2 == stream.bytesEnd) break;
 
-		advance(stream, nextEntity - stream.bytes);
+		// advance to the closest next entity
+		if (nextEntity1 - stream.bytes < nextEntity2 - stream.bytes)
+			advance(stream, nextEntity1 - stream.bytes);
+		else
+			advance(stream, nextEntity2 - stream.bytes);
 
 		// deserialize it
-		entityDeserializer.reset();
 		entityDeserializer.deserialize(stream);
 
 		// if we got a BasePlayer from it, print out the stats
 		if (entityDeserializer.baseNetworkable.hasSerialized() &&
 			entityDeserializer.basePlayer.hasSerialized()) {
+
 
 			updateEntity(entityDeserializer);
 		}
@@ -92,12 +103,8 @@ void EntitiesPacketHandler::updateEntity(const deserialize::Entity& entityDeseri
 		pair.second.hasName = true;
 		pair.second.name.assign((char const *)name);
 
-		printf("wrote player name: %s\n", pair.second.name.c_str());
-
 		entityMap->insert(pair);
 	}
-
-	printf("Got a player, id: %.8x - name: %s\n", uid, name);
 }
 
 

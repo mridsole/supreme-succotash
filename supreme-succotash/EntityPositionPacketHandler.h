@@ -29,6 +29,7 @@ public:
 		Entity(uint16_t _id, float x, float y, float z) :
 			id(_id),
 			position(x, y, z),
+			hasName(false),
 			name(),
 			packetsSinceObserved(0)
 		{}
@@ -39,16 +40,11 @@ public:
 
 	using EntityMap = std::map<uint32_t, Entity>;
 
-	EntityPositionPacketHandler();
+	EntityPositionPacketHandler(EntityMap* _entities);
 	~EntityPositionPacketHandler();
 
 	void handlePacket(uint8_t* param, const pcap_pkthdr* header,
 		const uint8_t* pkt_data);
-
-	EntityMap getEntities() {
-
-		return entities;
-	}
 
 	// Static functions for dealing with packets
 	static bool IsEntityPositionPacket(const uint8_t* pkt_data, uint32_t len);
@@ -58,7 +54,7 @@ private:
 	unsigned int pruneEntities();
 
 	// map all observed entities by their ID
-	EntityMap entities;
+	EntityMap* entities;
 
 	// every this many packets, remove entities that haven't been observed for a while
 	unsigned int howOftenToPrune;

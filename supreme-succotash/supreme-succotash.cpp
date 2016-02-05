@@ -74,7 +74,7 @@ GUIStatusMenuWindow* statusMenuWindow;
 
 // handles client tick packets
 TickPacketHandler* tickPacketHandler = new TickPacketHandler();
-EntityPositionPacketHandler* entityPositionPacketHandler = new EntityPositionPacketHandler();
+EntityPositionPacketHandler* entityPositionPacketHandler = new EntityPositionPacketHandler(&statusMenuState.entities);
 EntitiesPacketHandler* entitiesPacketHandler = new EntitiesPacketHandler(&statusMenuState.entities);
 
 // pointers to all our packet handlers
@@ -87,8 +87,8 @@ int main()
 {
 	// TESTING
 
-	// load in a test packet
-	//FILE* fileptr = fopen("testdata/entitiesnew", "rb");
+	//// load in a test packet
+	//FILE* fileptr = fopen("testdata/newentitiescass", "rb");
 	//fseek(fileptr, 0, SEEK_END);
 	//size_t len = ftell(fileptr);
 	//rewind(fileptr);
@@ -97,8 +97,6 @@ int main()
 	//fread(data, len, 1, fileptr);
 
 	//testEntitiesPacket(data, len);
-
-	//testEntityPositionPacket(data, len);
 
 	// END TESTING
 
@@ -185,7 +183,6 @@ int main()
 		statusMenuState.clientPosition = tickPacketHandler->getLastPlayerPosition();
 		statusMenuState.clientRotation = tickPacketHandler->getLastPlayerRotation();
 		statusMenuState.clientState = tickPacketHandler->getClientState();
-		statusMenuState.entities = entityPositionPacketHandler->getEntities();
 
 
 		// IMGUI
@@ -276,7 +273,8 @@ void testEntitiesPacket(const uint8_t* pkt_data, size_t len) {
 
 	// NOTE: the 0a is the start of a base networkable - the 0c is the length
 	// of the base networkable, the 08 is the first byte written by the base networkable
-	constexpr uint8_t searchFor[] = { 0x0a, 0x0c, 0x08 };
+	constexpr uint8_t searchFor1[] = { 0x0a, 0x0c, 0x08 };
+	constexpr uint8_t searchFor2[] = { 0x0a, 0x0d, 0x08 };
 
 	while (stream.bytes - stream.bytesStart < (int)stream.len - 4) {
 
@@ -284,12 +282,19 @@ void testEntitiesPacket(const uint8_t* pkt_data, size_t len) {
 		entityDeserializer.reset();
 
 		// advance to the next entity
-		uint8_t const * nextEntity = std::search(stream.bytes, stream.bytesEnd, 
-			searchFor, searchFor + 3);
+		uint8_t const * nextEntity1 = std::search(stream.bytes, stream.bytesEnd, 
+			searchFor1, searchFor1 + 3);
+		uint8_t const * nextEntity2 = std::search(stream.bytes, stream.bytesEnd,
+			searchFor2, searchFor2 + 3);
 
-		if (nextEntity == stream.bytesEnd) break;
+		if (nextEntity1  == stream.bytesEnd &&
+			nextEntity2 == stream.bytesEnd) break;
 
-		advance(stream, nextEntity - stream.bytes);
+		// advance to the closest next entity
+		if (nextEntity1 - stream.bytes < nextEntity2 - stream.bytes)
+			advance(stream, nextEntity1 - stream.bytes);
+		else
+			advance(stream, nextEntity2 - stream.bytes);
 
 		// deserialize it
 		entityDeserializer.deserialize(stream);
@@ -298,9 +303,6 @@ void testEntitiesPacket(const uint8_t* pkt_data, size_t len) {
 		if (entityDeserializer.baseNetworkable.hasSerialized() &&
 			entityDeserializer.basePlayer.hasSerialized()) {
 
-			printf("Got a player, id: %.8x - name: %s\n",
-				entityDeserializer.baseNetworkable.uid,
-				entityDeserializer.basePlayer.name);
 		}
 	}
 }
@@ -316,8 +318,6 @@ void testEntityPositionPacket(const uint8_t* pkt_data, size_t len) {
 	float x = readFloat(stream);
 	float y = readFloat(stream);
 	float z = readFloat(stream);
-
-	printf("hi");
 }
 
 void testTickPacket(const uint8_t* pkt_data, size_t len) {
@@ -328,6 +328,4 @@ void testTickPacket(const uint8_t* pkt_data, size_t len) {
 	deserialize::PlayerTick tickDeserializer;
 
 	tickDeserializer.deserialize(stream);
-
-	printf("done!\n");
 }
