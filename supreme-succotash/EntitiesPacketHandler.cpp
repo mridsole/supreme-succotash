@@ -85,11 +85,9 @@ void EntitiesPacketHandler::updateEntity(const deserialize::Entity& entityDeseri
 
 		Entity& ent = it->second;
 
-		if (!ent.hasName) {
+		ent.name.assign((char const *)name);
+		ent.hasName = true;
 
-			ent.name.assign((char const *)name);
-			ent.hasName = true;
-		}
 	} else {
 
 		float x = entityDeserializer.baseEntity.pos.x;

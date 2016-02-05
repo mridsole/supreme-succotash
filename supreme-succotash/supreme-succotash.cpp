@@ -226,7 +226,7 @@ void onAdapterChosen(const GUISelectAdapterWindow::Event& _event) {
 	openAdapterDevice(adapter);
 
 	compileSetFilter(adapter, 
-		std::string("(src 103.13.101.191 || dst 103.13.101.191) && proto 17"));
+		std::string("(src 192.168.1.7 || dst 192.168.1.7) && proto 17"));
 
 	beginHandling(adapter, packetHandlers);
 
