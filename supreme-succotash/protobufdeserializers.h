@@ -2,10 +2,39 @@
 
 #include "protobufutils.h"
 
+// for sf::Vector3f
+#include "SFML/Graphics.hpp"
+
 #define MAX_NAME_LEN 512
 
 namespace deserialize {
 
+using Vector3f = sf::Vector3f;
+
+// interface for deserializable protobufs
+class Deserializable {
+
+public:
+
+	Deserializable() : serialized(false) {};
+	virtual ~Deserializable() {};
+
+	virtual void deserialize(Stream& stream) {
+		serialized = true;
+	};
+
+	virtual void deserializeLengthDelimited(Stream& stream) {
+		serialized = true;
+	};
+
+	bool hasSerialized() { return this->serialized; }
+
+	virtual void reset() { serialized = false; }
+
+private:
+
+	bool serialized;
+};
 
 class BaseNetworkable : public Deserializable {
 
@@ -19,7 +48,13 @@ public:
 	BaseNetworkable() {};
 	~BaseNetworkable() {};
 
-	void deserialize(Stream& stream);
+	virtual void deserialize(Stream& stream);
+	virtual void deserializeLengthDelimited(Stream& stream);
+
+	virtual void reset() {
+
+		Deserializable::reset();
+	}
 };
 
 class BasePlayer : public Deserializable {
@@ -37,14 +72,24 @@ public:
 	uint32_t heldEntity;
 	float health;
 
+	// same goes for these
+	float skinCol;
+	float skinTex;
+	float skinMesh;
+
 
 	BasePlayer() {};
 	~BasePlayer() {};
 
-	void deserialize(Stream& stream);
+	virtual void deserialize(Stream& stream);
 
 	// first byte is varint32 representing length
-	void deserializeLengthDelimited(Stream& stream);
+	virtual void deserializeLengthDelimited(Stream& stream);
+
+	virtual void reset() {
+
+		Deserializable::reset();
+	}
 
 private:
 
@@ -61,15 +106,98 @@ public:
 	BasePlayer basePlayer;
 
 	bool createdThisFrame;
-
+	
 	Entity() {};
 	~Entity() {};
 
-	void deserialize(Stream& stream);
+	virtual void deserialize(Stream& stream);
+
+	virtual void reset() {
+
+		Deserializable::reset();
+
+		baseNetworkable.reset();
+		basePlayer.reset();
+	}
 
 private:
 
-	static void skipEntityComponent(Stream& stream, uint8_t entType);
+};
+
+
+class InputState : public Deserializable {
+
+public:
+
+	// DATA
+	int buttons;
+	Vector3f aimAngles;
+
+	InputState() {};
+	~InputState() {};
+
+	virtual void deserializeLengthDelimited(Stream& stream);
+
+	virtual void reset() {
+
+		Deserializable::reset();
+	}
+};
+
+class ModelState : public Deserializable {
+
+public:
+
+	// DATA
+	enum class Flag {
+		Ducked = 1,
+		Jumped = 2,
+		OnGround = 4,
+		Sleeping = 8,
+		Sprinting = 16,
+		OnLadder = 32,
+		Flying = 64
+	};
+
+	float waterLevel;
+	float aiming;
+	Vector3f lookDir;
+	int flags;
+
+	ModelState() {};
+	~ModelState() {};
+
+	virtual void deserializeLengthDelimited(Stream& stream);
+
+	virtual void reset() {
+
+		Deserializable::reset();
+	}
+};
+
+// deserializer for PlayerTick object
+class PlayerTick : public Deserializable
+{
+
+public:
+
+	// DATA
+	InputState inputState;
+	Vector3f position;
+	ModelState modelState;
+	uint32_t activeItem;
+	Vector3f eyePos;
+
+	PlayerTick() {};
+	~PlayerTick() {};
+
+	virtual void deserialize(Stream& stream);
+
+	virtual void reset() {
+
+		Deserializable::reset();
+	}
 };
 
 };
+

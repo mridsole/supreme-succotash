@@ -3,20 +3,16 @@
 
 #include <algorithm>
 
-#include "packetutils.h"
-#include "protobufutils.h"
-
 #define MAX_PLAYER_NAME_LEN 512
 
 
-EntitiesPacketHandler::EntitiesPacketHandler()
-{
-}
+EntitiesPacketHandler::EntitiesPacketHandler(EntityMap* _entityMap) :
+	entityMap(_entityMap)
+{}
 
 
 EntitiesPacketHandler::~EntitiesPacketHandler()
-{
-}
+{}
 
 
 void EntitiesPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr* header,
@@ -25,25 +21,67 @@ void EntitiesPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr* head
 	if (!isEntitiesPacket(param, header, pkt_data))
 		return;
 
-	// stream object for this packet
+	printf("entities packet received ...\n");
+
+	// bit of a hacky way of doing it but basically search for 0a 0d 08,
+	// which occurs at all the packets that we're interested in and identifies
+	// the start of the serialized entity
+
+	deserialize::Entity entityDeserializer;
+
+	// advance to the start of the entity
 	Stream stream = Stream(pkt_data, header->len);
+	advance(stream, 74);
 
-	// search for the bytes that seem to prefix the player name - 0x02 0x0a
-	const uint8_t playerPrefix[] = { 0x02, 0x0a };
-	uint8_t const* playerPrefixStart = std::search(pkt_data, pkt_data + header->len,
-		&(playerPrefix[0]), &(*(playerPrefix + 2)));
+	// NOTE: the 0a is the start of a base networkable - the 0c is the length
+	// of the base networkable, the 08 is the first byte written by the base networkable
+	constexpr uint8_t searchFor[] = { 0x0a, 0x0c, 0x08 };
 
-	// if we didn't find it just quit now
-	if (playerPrefixStart == pkt_data + header->len)
-		return;
+	while (stream.bytes - stream.bytesStart < stream.len - 4) {
 
-	// otherwise read the length of the player's name
-	uint8_t const ** stream = &playerPrefixStart;
-	//uint32_t playerNameLength = readVarint32(stream);
+		// advance to the next entity
+		uint8_t const * nextEntity = std::search(stream.bytes, stream.bytesEnd,
+			searchFor, searchFor + 3);
 
-	// now stream is at first byte of name so get it
-	char playerName[512];
-	//std::copy(*stream, *stream + playerNameLength, playerName);
+		if (nextEntity == stream.bytesEnd) break;
+
+		advance(stream, nextEntity - stream.bytes);
+
+		// deserialize it
+		entityDeserializer.deserialize(stream);
+
+		// if we got a BasePlayer from it, print out the stats
+		if (entityDeserializer.baseNetworkable.hasSerialized() &&
+			entityDeserializer.basePlayer.hasSerialized()) {
+
+			printf("Got a player, id: %.8x - name: %s\n",
+				entityDeserializer.baseNetworkable.uid,
+				entityDeserializer.basePlayer.name);
+
+			updateEntity(entityDeserializer);
+		}
+	}
+}
+
+void EntitiesPacketHandler::updateEntity(const deserialize::Entity entityDeserializer) {
+
+	uint32_t uid = entityDeserializer.baseNetworkable.uid;
+	uint8_t const * name = entityDeserializer.basePlayer.name;
+
+	// find or create the entity in the map
+	// TODO: if we're creating here we need to give it it's position
+	// which we currently don't deserialize
+
+	EntityMap::iterator it = entityMap->find(uid);
+	
+	// found something
+	if (it != entityMap->end()) {
+
+		Entity& ent = it->second;
+		
+		if (!ent.hasName)
+			ent.name.assign((char const *)name);
+	}
 }
 
 

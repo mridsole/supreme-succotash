@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "EntityPositionPacketHandler.h"
 
+#include "protobufutils.h"
+
 #include "stdio.h"
 
 EntityPositionPacketHandler::EntityPositionPacketHandler():
@@ -24,24 +26,39 @@ void EntityPositionPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr
 	if (!EntityPositionPacketHandler::IsEntityPositionPacket(pkt_data, header->len)) 
 		return;
 
-	// the coordinates
-	float x = *((float*)(pkt_data + 70));
-	float y = *((float*)(pkt_data + 74));
-	float z = *((float*)(pkt_data + 78));
+	// stream for our packet
+	Stream stream = Stream(pkt_data, header->len);
+	advance(stream, 66);
 
-	uint16_t entityID = *((uint16_t*)(pkt_data + 66));
+	uint32_t entityID = readUInt32(stream);
+
+	// read the position
+	float x = readFloat(stream);
+	float y = readFloat(stream);
+	float z = readFloat(stream);
+
+	// read the rotation
+	float pitch = readFloat(stream);
+	float yaw	= readFloat(stream);
+	float roll	= readFloat(stream);
 
 	// if the given id doesn't exist make an entry for it and store the pos
 	// otherwise update the existing pos
 	if (entities.find(entityID) == entities.end()) {
 
-		entities.insert( std::pair<uint16_t, Entity>(entityID, Entity(entityID, x, y, z)) );
+		auto pair = std::pair<uint32_t, Entity>(entityID, Entity(entityID, x, y, z));
+		pair.second.rotation = sf::Vector3f(pitch, yaw, roll);
+		entities.insert(pair);
 
 	} else {
 
 		entities[entityID].position.x = x;
 		entities[entityID].position.y = y;
 		entities[entityID].position.z = z;
+
+		entities[entityID].rotation.x = pitch;
+		entities[entityID].rotation.y = yaw;
+		entities[entityID].rotation.z = roll;
 
 		// set prune counter to zero
 		entities[entityID].packetsSinceObserved = 0;

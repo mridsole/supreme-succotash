@@ -96,6 +96,9 @@
     <ClInclude Include="protobufutils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="protobufdeserializers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -150,6 +153,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="protobufutils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="protobufdeserializers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

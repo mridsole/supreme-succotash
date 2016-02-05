@@ -3,6 +3,7 @@
 
 #include "stdint.h"
 #include <map>
+#include <string>
 
 #include "SFML/Graphics.hpp"
 
@@ -18,12 +19,17 @@ public:
 
 		uint16_t id;
 		sf::Vector3f position;
+		sf::Vector3f rotation;
+
+		bool hasName;
+		std::string name;
 
 		unsigned int packetsSinceObserved;
 
 		Entity(uint16_t _id, float x, float y, float z) :
 			id(_id),
 			position(x, y, z),
+			name(),
 			packetsSinceObserved(0)
 		{}
 
@@ -31,7 +37,7 @@ public:
 		Entity() {};
 	};
 
-	using EntityMap = std::map<uint16_t, Entity>;
+	using EntityMap = std::map<uint32_t, Entity>;
 
 	EntityPositionPacketHandler();
 	~EntityPositionPacketHandler();

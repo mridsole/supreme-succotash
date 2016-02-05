@@ -29,9 +29,14 @@
 #include "TestPacketHandler.h"
 #include "TickPacketHandler.h"
 #include "EntityPositionPacketHandler.h"
+#include "EntitiesPacketHandler.h"
 
 // for rendering entity positions
 #include "Radar.h"
+
+// for testing, currently
+#include "protobufutils.h"
+#include "protobufdeserializers.h"
 
 // forward declarations:
 
@@ -40,6 +45,10 @@ void onAdapterChosen(const GUISelectAdapterWindow::Event& _event);
 
 // poll window events and store in the given vector
 int pollWindowEvents(sf::Window& window, std::vector<sf::Event>& events);
+
+void testEntitiesPacket(const uint8_t* pkt_data, size_t len);
+void testEntityPositionPacket(const uint8_t* pkt_data, size_t len);
+void testTickPacket(const uint8_t* pkt_data, size_t len);
 
 
 // state storage for selecting adapters
@@ -66,6 +75,7 @@ GUIStatusMenuWindow* statusMenuWindow;
 // handles client tick packets
 TickPacketHandler* tickPacketHandler = new TickPacketHandler();
 EntityPositionPacketHandler* entityPositionPacketHandler = new EntityPositionPacketHandler();
+EntitiesPacketHandler* entitiesPacketHandler = new EntitiesPacketHandler(&statusMenuState.entities);
 
 // pointers to all our packet handlers
 std::vector<PacketHandler*> packetHandlers;
@@ -75,9 +85,25 @@ Radar* radar;
 
 int main()
 {
+	// TESTING
+
+	// load in a test packet
+	FILE* fileptr = fopen("testdata/newticktest", "rb");
+	fseek(fileptr, 0, SEEK_END);
+	size_t len = ftell(fileptr);
+	rewind(fileptr);
+
+	uint8_t data[2000];
+	fread(data, len, 1, fileptr);
+
+	testTickPacket(data, len);
+
+	// END TESTING
+
 	// which packet handlers we need
 	packetHandlers.push_back(tickPacketHandler);
 	packetHandlers.push_back(entityPositionPacketHandler);
+	packetHandlers.push_back(entitiesPacketHandler);
 
 	// we need a frame update dispatcher to do much here
 	FrameUpdateDispatcher frameUpdateDispatcher;
@@ -236,4 +262,70 @@ int pollWindowEvents(sf::Window& window, std::vector<sf::Event>& events) {
 		events.resize(events.size() - 1);
 
 	return events.size();
+}
+
+void testEntitiesPacket(const uint8_t* pkt_data, size_t len) {
+
+	deserialize::Entity entityDeserializer;
+
+	// advance to the start of the entity
+	Stream stream = Stream(pkt_data, len);
+	advance(stream, 74);
+
+	// NOTE: the 0a is the start of a base networkable - the 0c is the length
+	// of the base networkable, the 08 is the first byte written by the base networkable
+	constexpr uint8_t searchFor[] = { 0x0a, 0x0c, 0x08 };
+
+	while (stream.bytes - stream.bytesStart < stream.len - 4) {
+
+		// reset the deserializer
+		entityDeserializer.reset();
+
+		// advance to the next entity
+		uint8_t const * nextEntity = std::search(stream.bytes, stream.bytesEnd, 
+			searchFor, searchFor + 3);
+
+		if (nextEntity == stream.bytesEnd) break;
+
+		advance(stream, nextEntity - stream.bytes);
+
+		// deserialize it
+		entityDeserializer.deserialize(stream);
+
+		// if we got a BasePlayer from it, print out the stats
+		if (entityDeserializer.baseNetworkable.hasSerialized() &&
+			entityDeserializer.basePlayer.hasSerialized()) {
+
+			printf("Got a player, id: %.8x - name: %s\n",
+				entityDeserializer.baseNetworkable.uid,
+				entityDeserializer.basePlayer.name);
+		}
+	}
+}
+
+void testEntityPositionPacket(const uint8_t* pkt_data, size_t len) {
+
+	// stream for our packet
+	Stream stream = Stream(pkt_data, len);
+	advance(stream, 66);
+
+	uint32_t entityID = readUInt32(stream);
+
+	float x = readFloat(stream);
+	float y = readFloat(stream);
+	float z = readFloat(stream);
+
+	printf("hi");
+}
+
+void testTickPacket(const uint8_t* pkt_data, size_t len) {
+
+	Stream stream = Stream(pkt_data, len);
+	advance(stream, 70);
+
+	deserialize::PlayerTick tickDeserializer;
+
+	tickDeserializer.deserialize(stream);
+
+	printf("done!\n");
 }

@@ -31,8 +31,11 @@ void Radar::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		target.draw(entCircle);
 
 		// also draw the ID of the entity next to it
-		char entIDStr[100]; sprintf(entIDStr, "0x%.4x", pair.second.id);
-		sf::Text idText = sf::Text(sf::String(entIDStr), font, 14);
+		char entStr[512]; sprintf(entStr, "0x%.4x\n", pair.second.id);
+		if (pair.second.hasName)
+			strcpy(entStr + 7, pair.second.name.c_str());
+
+		sf::Text idText = sf::Text(sf::String(entStr), font, 14);
 
 		idText.setPosition(sf::Vector2f(entCircle.getPosition().x + 15, entCircle.getPosition().y));
 		idText.setColor(sf::Color(255, 255, 255, 255));

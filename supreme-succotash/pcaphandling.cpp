@@ -77,6 +77,8 @@ bpf_program compileSetFilter(const AdapterDevice& device, std::string filterStri
 			<< std::endl;
 	}
 
+	pcap_setfilter(device.handle, &compiledFilter);
+
 	return compiledFilter;
 }
 

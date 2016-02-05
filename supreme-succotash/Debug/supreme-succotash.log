@@ -1,3 +1,2 @@
-﻿  Radar.cpp
-e:\projects\supreme-succotash\supreme-succotash\radar.cpp(59): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+﻿Debug\pcaphandling.obj : warning LNK4042: object specified more than once; extras ignored
   supreme-succotash.vcxproj -> E:\projects\supreme-succotash\Debug\supreme-succotash.exe

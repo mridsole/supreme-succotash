@@ -11,17 +11,29 @@ void advance(Stream& stream, size_t n) {
 	stream.bytes += n;
 }
 
-uint8_t readByte(Stream& stream) {
+int32_t readByte(Stream& stream) {
 
-	uint8_t byte = *stream.bytes;
-	stream.bytes++;
+	if (stream.bytes - stream.bytesStart >= stream.len) {
+		return -1;
 
-	return byte;
+	} else {
+		uint8_t byte = *stream.bytes;
+		stream.bytes++;
+		return byte;
+	}
 }
 
 float readFloat(Stream& stream) {
 
 	float val = *((float*)(stream.bytes));
+	stream.bytes += 4;
+
+	return val;
+}
+
+uint32_t readUInt32(Stream& stream) {
+
+	uint32_t val = *((uint32_t*)(stream.bytes));
 	stream.bytes += 4;
 
 	return val;
@@ -72,6 +84,9 @@ size_t readString(Stream& stream, uint8_t* buf) {
 	// copy the string data to the buffer
 	std::copy(stream.bytes, stream.bytes + strLen, buf);
 
+	// stick a zero byte at the end of the buffer
+	buf[strLen] = 0x00;
+
 	// move the stream forward
 	stream.bytes += strLen;
 
@@ -103,4 +118,6 @@ sf::Vector3f readVector3f(Stream& stream) {
 			// handle the 'key' things here?
 		}
 	}
+
+	return vec;
 }
