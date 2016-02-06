@@ -70,18 +70,26 @@ void GUIStatusMenuWindow::draw(const sf::Vector2u& windowSize) {
 	static int entitySelected = 0;
 
 	// we need to turn the uint16_t identifiers into a char**
-	char buf[10000];
-	char* idStrings[1000];
+	static char buf[10000];
+	char const * idStrings[1000];
 	int i = 0; int j = 0;
 
 	// (also while we're at it get the IDs themselves
-	uint16_t ids[1000];
+	uint32_t ids[1000];
 
 	for (auto const &pair1 : *(state.entities)) {
 
-		idStrings[i] = buf + j;
 		ids[i] = pair1.second.id;
-		j += sprintf(buf + j, "0x%.2x", pair1.second.id) + 1;
+
+		// if it has a name, show it - otherwise just use ID
+		if (pair1.second.hasName) {
+
+			idStrings[i] = pair1.second.name.c_str();
+		
+		} else {
+			idStrings[i] = buf + j;
+			j += sprintf(buf + j, "0x%.8x", pair1.second.id) + 1;
+		}
 
 		i++;
 	}

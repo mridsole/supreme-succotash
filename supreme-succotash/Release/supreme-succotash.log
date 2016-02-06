@@ -1,26 +1,5 @@
-﻿  EntitiesPacketHandler.cpp
-EntitiesPacketHandler.cpp(101): warning C4018: '<': signed/unsigned mismatch
-  EntityPositionPacketHandler.cpp
-  GUIStatusMenuWindow.cpp
-GUIStatusMenuWindow.cpp(118): warning C4305: 'argument': truncation from 'double' to 'float'
-GUIStatusMenuWindow.cpp(120): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
-  TickPacketHandler.cpp
-  protobufdeserializers.cpp
-protobufdeserializers.cpp(49): warning C4018: '<': signed/unsigned mismatch
-protobufdeserializers.cpp(62): warning C4244: '=': conversion from 'uint64_t' to 'int', possible loss of data
-protobufdeserializers.cpp(66): warning C4244: '=': conversion from 'uint64_t' to 'int', possible loss of data
-protobufdeserializers.cpp(115): warning C4018: '<': signed/unsigned mismatch
-protobufdeserializers.cpp(192): warning C4800: 'int32_t': forcing value to bool 'true' or 'false' (performance warning)
-protobufdeserializers.cpp(208): warning C4018: '<': signed/unsigned mismatch
-protobufdeserializers.cpp(215): warning C4244: '=': conversion from 'uint64_t' to 'int', possible loss of data
-protobufdeserializers.cpp(235): warning C4018: '<': signed/unsigned mismatch
-protobufdeserializers.cpp(251): warning C4244: '=': conversion from 'uint64_t' to 'int', possible loss of data
-  protobufutils.cpp
-protobufutils.cpp(25): warning C4018: '>=': signed/unsigned mismatch
-  supreme-succotash.cpp
-LINK : warning C4727: PCH named e:\projects\supreme-succotash\supreme-succotash\release\supreme-succotash.pch with same timestamp found in e:\projects\supreme-succotash\supreme-succotash\release\entitypositionpackethandler.obj and e:\projects\supreme-succotash\supreme-succotash\release\entitiespackethandler.obj.  Using first PCH.
+﻿  EntityPositionPacketHandler.cpp
 LINK : warning C4727: PCH named e:\projects\supreme-succotash\supreme-succotash\release\supreme-succotash.pch with same timestamp found in e:\projects\supreme-succotash\supreme-succotash\release\guiselectadapterwindow.obj and e:\projects\supreme-succotash\supreme-succotash\release\codelockpackethandler.obj.  Using first PCH.
-LINK : warning C4727: PCH named e:\projects\supreme-succotash\supreme-succotash\release\supreme-succotash.pch with same timestamp found in e:\projects\supreme-succotash\supreme-succotash\release\guistatusmenuwindow.obj and e:\projects\supreme-succotash\supreme-succotash\release\entitiespackethandler.obj.  Using first PCH.
 LINK : warning C4727: PCH named e:\projects\supreme-succotash\supreme-succotash\release\supreme-succotash.pch with same timestamp found in e:\projects\supreme-succotash\supreme-succotash\release\packethandler.obj and e:\projects\supreme-succotash\supreme-succotash\release\codelockpackethandler.obj.  Using first PCH.
 LINK : warning C4727: PCH named e:\projects\supreme-succotash\supreme-succotash\release\supreme-succotash.pch with same timestamp found in e:\projects\supreme-succotash\supreme-succotash\release\packetutils.obj and e:\projects\supreme-succotash\supreme-succotash\release\codelockpackethandler.obj.  Using first PCH.
 LINK : warning C4727: PCH named e:\projects\supreme-succotash\supreme-succotash\release\supreme-succotash.pch with same timestamp found in e:\projects\supreme-succotash\supreme-succotash\release\protobufdeserializers.obj and e:\projects\supreme-succotash\supreme-succotash\release\entitiespackethandler.obj.  Using first PCH.
@@ -31,9 +10,8 @@ LINK : warning C4727: PCH named e:\projects\supreme-succotash\supreme-succotash\
 LINK : warning C4727: PCH named e:\projects\supreme-succotash\supreme-succotash\release\supreme-succotash.pch with same timestamp found in e:\projects\supreme-succotash\supreme-succotash\release\testpackethandler.obj and e:\projects\supreme-succotash\supreme-succotash\release\codelockpackethandler.obj.  Using first PCH.
 Release\pcaphandling.obj : warning LNK4042: object specified more than once; extras ignored
   Generating code
-e:\projects\supreme-succotash\supreme-succotash\protobufutils.cpp(87): warning C4715: 'readVarint64': not all control paths return a value
-  58 of 1673 functions ( 3.5%) were compiled, the rest were copied from previous compilation.
-    15 functions were new in current compilation
-    16 functions had inline decision re-evaluated but remain unchanged
+  2 of 1673 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    8 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   supreme-succotash.vcxproj -> E:\projects\supreme-succotash\Release\supreme-succotash.exe

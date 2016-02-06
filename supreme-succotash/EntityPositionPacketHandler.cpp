@@ -83,7 +83,7 @@ void EntityPositionPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr
 bool EntityPositionPacketHandler::IsEntityPositionPacket(
 	const uint8_t* pkt_data, uint32_t len) {
 
-	if (len == 94 && pkt_data[65] == 0x96)
+	if (len >= 94 && pkt_data[65] == 0x96)
 		return true;
 
 	return false;
