@@ -24,6 +24,9 @@ public:
 		bool hasName;
 		std::string name;
 
+		// is it zuckles?
+		bool isZuckles;
+
 		unsigned int packetsSinceObserved;
 
 		Entity(uint16_t _id, float x, float y, float z) :
@@ -31,6 +34,7 @@ public:
 			position(x, y, z),
 			hasName(false),
 			name(),
+			isZuckles(false),
 			packetsSinceObserved(0)
 		{}
 

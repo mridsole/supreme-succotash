@@ -70,6 +70,10 @@ sf::CircleShape Radar::getEntityCircle(const EntityPositionPacketHandler::Entity
 		screenSize.y / 2 - fromClient.y / config.scale - config.entityRadius
 		));
 
+	// special case
+	if (entity.isZuckles)
+		entCircle.setFillColor(sf::Color(247, 243, 97, 255));
+
 	return entCircle;
 }
 
