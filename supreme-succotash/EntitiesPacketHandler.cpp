@@ -81,6 +81,8 @@ void EntitiesPacketHandler::updateEntity(const deserialize::Entity& entityDeseri
 		if (entityDeserializer.basePlayer.userid == 76561198080768316)
 			ent.isZuckles = true;
 
+		ent.displayStr.assign(ent.name.c_str());
+
 	} else {
 
 		float x = entityDeserializer.baseEntity.pos.x;
@@ -96,6 +98,8 @@ void EntitiesPacketHandler::updateEntity(const deserialize::Entity& entityDeseri
 
 		if (entityDeserializer.basePlayer.userid == 76561198080768316)
 			pair.second.isZuckles = true;
+
+		pair.second.displayStr.assign(pair.second.name.c_str());
 
 		entityMap->insert(pair);
 	}

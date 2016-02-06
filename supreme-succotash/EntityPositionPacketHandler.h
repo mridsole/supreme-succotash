@@ -23,6 +23,7 @@ public:
 
 		bool hasName;
 		std::string name;
+		std::string displayStr;
 
 		// is it zuckles?
 		bool isZuckles;

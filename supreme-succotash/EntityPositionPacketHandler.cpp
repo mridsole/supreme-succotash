@@ -50,6 +50,9 @@ void EntityPositionPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr
 		pair.second.rotation = sf::Vector3f(pitch, yaw, roll);
 		entities->insert(pair);
 
+		char buf[20]; sprintf(buf, "0x%.4x", entityID);
+		pair.second.displayStr.assign(buf);
+
 	} else {
 
 		(*entities)[entityID].position.x = x;
@@ -98,7 +101,8 @@ unsigned int EntityPositionPacketHandler::pruneEntities() {
 
 	while (it != entities->end()) {
 
-		if (it->second.packetsSinceObserved >= pruneAfter) {
+		if (it->second.packetsSinceObserved >= pruneAfter &&
+			it->second.hasName == false) {
 
 			EntityMap::iterator it_next;
 			it = entities->erase(it);
