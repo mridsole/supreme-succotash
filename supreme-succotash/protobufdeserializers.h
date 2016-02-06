@@ -16,24 +16,31 @@ class Deserializable {
 
 public:
 
-	Deserializable() : serialized(false) {};
+	Deserializable() : serialized(false), successful(false) {};
 	virtual ~Deserializable() {};
 
-	virtual void deserialize(Stream& stream) {
+	virtual bool deserialize(Stream& stream) {
 		serialized = true;
+		return serialized;
 	};
 
-	virtual void deserializeLengthDelimited(Stream& stream) {
+	virtual bool deserializeLengthDelimited(Stream& stream) {
 		serialized = true;
+		return serialized;
 	};
 
 	bool hasSerialized() { return this->serialized; }
+	bool wasSuccessful() { return this->successful; }
 
-	virtual void reset() { serialized = false; }
+	virtual void reset() { serialized = false; successful = false; }
 
-private:
+protected:
+
+	void fail() { this->successful = false; }
+	void success() { this->successful = true; }
 
 	bool serialized;
+	bool successful;
 };
 
 class BaseNetworkable : public Deserializable {
@@ -48,8 +55,8 @@ public:
 	BaseNetworkable() {};
 	~BaseNetworkable() {};
 
-	virtual void deserialize(Stream& stream);
-	virtual void deserializeLengthDelimited(Stream& stream);
+	virtual bool deserialize(Stream& stream);
+	virtual bool deserializeLengthDelimited(Stream& stream);
 
 	virtual void reset() {
 
@@ -70,7 +77,7 @@ public:
 	BaseEntity() {};
 	~BaseEntity() {};
 
-	virtual void deserializeLengthDelimited(Stream& stream);
+	virtual bool deserializeLengthDelimited(Stream& stream);
 
 	virtual void reset() {
 
@@ -102,10 +109,10 @@ public:
 	BasePlayer() {};
 	~BasePlayer() {};
 
-	virtual void deserialize(Stream& stream);
+	virtual bool deserialize(Stream& stream);
 
 	// first byte is varint32 representing length
-	virtual void deserializeLengthDelimited(Stream& stream);
+	virtual bool deserializeLengthDelimited(Stream& stream);
 
 	virtual void reset() {
 
@@ -132,7 +139,7 @@ public:
 	Entity() {};
 	~Entity() {};
 
-	virtual void deserialize(Stream& stream);
+	virtual bool deserialize(Stream& stream);
 
 	virtual void reset() {
 
@@ -159,7 +166,7 @@ public:
 	InputState() {};
 	~InputState() {};
 
-	virtual void deserializeLengthDelimited(Stream& stream);
+	virtual bool deserializeLengthDelimited(Stream& stream);
 
 	virtual void reset() {
 
@@ -190,7 +197,7 @@ public:
 	ModelState() {};
 	~ModelState() {};
 
-	virtual void deserializeLengthDelimited(Stream& stream);
+	virtual bool deserializeLengthDelimited(Stream& stream);
 
 	virtual void reset() {
 
@@ -214,7 +221,7 @@ public:
 	PlayerTick() {};
 	~PlayerTick() {};
 
-	virtual void deserialize(Stream& stream);
+	virtual bool deserialize(Stream& stream);
 
 	virtual void reset() {
 

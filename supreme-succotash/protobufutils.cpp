@@ -11,6 +11,15 @@ void advance(Stream& stream, size_t n) {
 	stream.bytes += n;
 }
 
+bool inRange(Stream& stream) {
+
+	if (stream.bytes >= stream.bytesStart &&
+		stream.bytes < stream.bytesEnd)
+		return true;
+	else
+		return false;
+}
+
 int32_t readByte(Stream& stream) {
 
 	if (stream.bytes - stream.bytesStart >= stream.len) {

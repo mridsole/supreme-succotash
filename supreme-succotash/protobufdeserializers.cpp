@@ -4,36 +4,51 @@
 
 using namespace deserialize;
 
-void BaseNetworkable::deserialize(Stream& stream) {
+bool BaseNetworkable::deserialize(Stream& stream) {
 
 	Deserializable::deserialize(stream);
+
+	if (!inRange(stream)) { fail(); return false; }
 
 	// pretty simple
 	advance(stream, 1);
 	this->uid = readVarint32(stream);
+	if (!inRange(stream)) { fail(); return false; }
 	advance(stream, 1);
 	this->group = readVarint32(stream);
+	if (!inRange(stream)) { fail(); return false; }
 	advance(stream, 1);
 	this->prefabID = readVarint32(stream);
+	if (!inRange(stream)) { fail(); return false; }
+
+	success(); return true;
 }
 
-void BaseNetworkable::deserializeLengthDelimited(Stream& stream) {
+bool BaseNetworkable::deserializeLengthDelimited(Stream& stream) {
 
 	Deserializable::deserializeLengthDelimited(stream);
+
+	if (!inRange(stream)) { fail(); return false; }
 
 	// yer na
 	uint32_t len = readVarint32(stream);
 	this->deserialize(stream);
+
+	success(); return true;
 }
 
-void BaseEntity::deserializeLengthDelimited(Stream& stream) {
+bool BaseEntity::deserializeLengthDelimited(Stream& stream) {
 
 	Deserializable::deserializeLengthDelimited(stream);
+
+	if (!inRange(stream)) { fail(); return false; }
 
 	uint32_t len = readVarint32(stream);
 	uint8_t const * start = stream.bytes;
 
 	while (stream.bytes - start < len) {
+
+		if (!inRange(stream)) { fail(); return false; }
 
 		uint32_t type = readByte(stream);
 
@@ -51,15 +66,19 @@ void BaseEntity::deserializeLengthDelimited(Stream& stream) {
 			this->skin = readVarint64(stream);
 		}
 	}
+
+	success(); return true;
 }
 
 // DON'T USE THIS YET
-void BasePlayer::deserialize(Stream& stream) {
+bool BasePlayer::deserialize(Stream& stream) {
 
 	Deserializable::deserialize(stream);
 
 	// skipping a lot of things here
 	while (true) {
+
+		if (!inRange(stream)) { fail(); return false; }
 
 		uint8_t type = readByte(stream);
 
@@ -78,18 +97,24 @@ void BasePlayer::deserialize(Stream& stream) {
 
 		}
 	}
+
+	success(); return true;
 }
 
 // .. use this instead
-void BasePlayer::deserializeLengthDelimited(Stream& stream) {
+bool BasePlayer::deserializeLengthDelimited(Stream& stream) {
 
 	Deserializable::deserializeLengthDelimited(stream);
+
+	if (!inRange(stream)) { fail(); return false; }
 
 	// read the length
 	uint32_t len = readVarint32(stream);
 	uint8_t const * start = stream.bytes;
 
 	while (stream.bytes - start < len) {
+
+		if (!inRange(stream)) { fail(); return false; }
 
 		uint32_t type = readVarint32(stream);
 
@@ -121,11 +146,13 @@ void BasePlayer::deserializeLengthDelimited(Stream& stream) {
 			advance(stream, readVarint32(stream));
 		}
 	}
+
+	success(); return true;
 }
 
 
 // deserialize an Entities message
-void Entity::deserialize(Stream& stream) {
+bool Entity::deserialize(Stream& stream) {
 
 	Deserializable::deserialize(stream);
 
@@ -133,16 +160,24 @@ void Entity::deserialize(Stream& stream) {
 	// but there is some other useful info in here
 	while (true) {
 
+		if (!inRange(stream)) { fail(); return false; }
+
 		int32_t entType = readVarint32(stream);
 
 		if (entType == (int32_t)10) {
-			this->baseNetworkable.deserializeLengthDelimited(stream);
+			if (!this->baseNetworkable.deserializeLengthDelimited(stream)) {
+				fail(); return false;
+			}
 
 		} else if (entType == (int32_t)18) {
-			this->baseEntity.deserializeLengthDelimited(stream);
+			if (!this->baseEntity.deserializeLengthDelimited(stream)) {
+				fail(); return false;
+			}
 
 		} else if (entType == (int32_t)26) {
-			this->basePlayer.deserializeLengthDelimited(stream);
+			if (!this->basePlayer.deserializeLengthDelimited(stream)) {
+				fail(); return false;
+			}
 
 		} else if (entType != (int32_t)800) {
 
@@ -151,22 +186,28 @@ void Entity::deserialize(Stream& stream) {
 
 		} else {
 
+			if (!inRange(stream)) { fail(); return false; }
+
 			// reached the end of the entity
 			this->createdThisFrame = (bool)readByte(stream);
 
-			return;
+			success(); return true;
 		}
 	}
 }
 
-void InputState::deserializeLengthDelimited(Stream& stream) {
+bool InputState::deserializeLengthDelimited(Stream& stream) {
 
 	Deserializable::deserializeLengthDelimited(stream);
+
+	if (!inRange(stream)) { fail(); return false; }
 
 	uint32_t len = readVarint32(stream);
 	uint8_t const * start = stream.bytes;
 
 	while (stream.bytes - start < len) {
+
+		if (!inRange(stream)) { fail(); return false; }
 
 		int32_t type = readByte(stream);
 
@@ -178,16 +219,22 @@ void InputState::deserializeLengthDelimited(Stream& stream) {
 
 		}
 	}
+	
+	success(); return true;
 }
 
-void ModelState::deserializeLengthDelimited(Stream& stream) {
+bool ModelState::deserializeLengthDelimited(Stream& stream) {
 
 	Deserializable::deserializeLengthDelimited(stream);
+
+	if (!inRange(stream)) { fail(); return false; }
 
 	uint32_t len = readVarint32(stream);
 	uint8_t const * start = stream.bytes;
 
 	while (stream.bytes - start < len) {
+
+		if (!inRange(stream)) { fail(); return false; }
 
 		int32_t type = readByte(stream);
 
@@ -205,26 +252,33 @@ void ModelState::deserializeLengthDelimited(Stream& stream) {
 
 		}
 	}
-	
+
+	success(); return true;
 }
 
 
-void PlayerTick::deserialize(Stream& stream) {
+bool PlayerTick::deserialize(Stream& stream) {
 
 	Deserializable::deserialize(stream);
 
 	while (true) {
 
+		if (!inRange(stream)) { fail(); return false; }
+
 		int32_t type = readByte(stream);
 
 		if (type == (int32_t)10) {
-			this->inputState.deserializeLengthDelimited(stream);
+			if (!this->inputState.deserializeLengthDelimited(stream)) {
+				fail(); return false;
+			}
 
 		} else if (type == (int32_t)18) {
 			this->position = readVector3f(stream);
 
 		} else if (type == (int32_t)34) {
-			this->modelState.deserializeLengthDelimited(stream);
+			if (!this->modelState.deserializeLengthDelimited(stream)) {
+				fail(); return false;
+			}
 
 		} else if (type == (int32_t)40) {
 			this->activeItem = readVarint32(stream);
@@ -233,8 +287,8 @@ void PlayerTick::deserialize(Stream& stream) {
 			this->eyePos = readVector3f(stream);
 
 		} else if (type == -1) {
-
-			return;
+			
+			success(); return true;
 		}
 	}
 }

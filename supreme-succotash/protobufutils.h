@@ -25,6 +25,9 @@ struct Stream {
 // move forward this many bytes
 void advance(Stream& stream, size_t n);
 
+// is this stream still in ramge
+bool inRange(Stream& stream);
+
 // read a single byte and move the pointer forward
 int32_t readByte(Stream& stream);
 

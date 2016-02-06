@@ -87,16 +87,16 @@ int main()
 {
 	// TESTING
 
-	//// load in a test packet
-	//FILE* fileptr = fopen("testdata/newentitiescass", "rb");
-	//fseek(fileptr, 0, SEEK_END);
-	//size_t len = ftell(fileptr);
-	//rewind(fileptr);
+	// load in a test packet
+	/*FILE* fileptr = fopen("testdata/entitiesdanielbad", "rb");
+	fseek(fileptr, 0, SEEK_END);
+	size_t len = ftell(fileptr);
+	rewind(fileptr);
 
-	//uint8_t data[2000];
-	//fread(data, len, 1, fileptr);
+	uint8_t data[2000];
+	fread(data, len, 1, fileptr);
 
-	//testEntitiesPacket(data, len);
+	testEntitiesPacket(data, len);*/
 
 	// END TESTING
 
@@ -155,7 +155,7 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(800, 600), 
 		"Zuckles Removal Tool 7.1 Home Premium Edition", sf::Style::Close);
 
-	window.setFramerateLimit(60);
+	window.setFramerateLimit(30);
 
 	// SET IMGUI STUFF
 	ImGui::SFML::SetWindow(window);
@@ -271,38 +271,24 @@ void testEntitiesPacket(const uint8_t* pkt_data, size_t len) {
 	Stream stream = Stream(pkt_data, len);
 	advance(stream, 74);
 
-	// NOTE: the 0a is the start of a base networkable - the 0c is the length
-	// of the base networkable, the 08 is the first byte written by the base networkable
-	constexpr uint8_t searchFor1[] = { 0x0a, 0x0c, 0x08 };
-	constexpr uint8_t searchFor2[] = { 0x0a, 0x0d, 0x08 };
-
-	while (stream.bytes - stream.bytesStart < (int)stream.len - 4) {
+	while (true) {
 
 		// reset the deserializer
 		entityDeserializer.reset();
 
 		// advance to the next entity
-		uint8_t const * nextEntity1 = std::search(stream.bytes, stream.bytesEnd, 
-			searchFor1, searchFor1 + 3);
-		uint8_t const * nextEntity2 = std::search(stream.bytes, stream.bytesEnd,
-			searchFor2, searchFor2 + 3);
-
-		if (nextEntity1  == stream.bytesEnd &&
-			nextEntity2 == stream.bytesEnd) break;
-
-		// advance to the closest next entity
-		if (nextEntity1 - stream.bytes < nextEntity2 - stream.bytes)
-			advance(stream, nextEntity1 - stream.bytes);
-		else
-			advance(stream, nextEntity2 - stream.bytes);
+		if (!EntitiesPacketHandler::nextEntity(stream))
+			break;
 
 		// deserialize it
 		entityDeserializer.deserialize(stream);
 
 		// if we got a BasePlayer from it, print out the stats
-		if (entityDeserializer.baseNetworkable.hasSerialized() &&
-			entityDeserializer.basePlayer.hasSerialized()) {
+		if (entityDeserializer.baseNetworkable.wasSuccessful() &&
+			entityDeserializer.basePlayer.wasSuccessful() && 
+			entityDeserializer.wasSuccessful()) {
 
+			printf("yer\n");
 		}
 	}
 }

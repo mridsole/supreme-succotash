@@ -36,7 +36,7 @@ void Radar::draw(sf::RenderTarget& target, sf::RenderStates states) const {
 		if (pair.second.hasName)
 			strcat(entStr, pair.second.name.c_str());
 
-		sf::Text idText = sf::Text(sf::String(entStr), font, 14);
+		sf::Text idText = sf::Text(sf::String(entStr), font, 16);
 
 		idText.setPosition(sf::Vector2f((int)entCircle.getPosition().x + 15, 
 			(int)entCircle.getPosition().y));

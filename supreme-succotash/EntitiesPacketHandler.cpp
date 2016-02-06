@@ -31,38 +31,28 @@ void EntitiesPacketHandler::handlePacket(uint8_t* param, const pcap_pkthdr* head
 	Stream stream = Stream(pkt_data, header->len);
 	advance(stream, 74);
 
-	// NOTE: the 0a is the start of a base networkable - the 0c is the length
-	// of the base networkable, the 08 is the first byte written by the base networkable
-	constexpr uint8_t searchFor1[] = { 0x0a, 0x0c, 0x08 };
-	constexpr uint8_t searchFor2[] = { 0x0a, 0x0d, 0x08 };
+	int i = 0;
 
-	while (stream.bytes - stream.bytesStart < (int)stream.len - 4) {
+	while (true) {
+
+		i++;
+		if (i > 100)
+			printf("looks like we're stuck!\n");
 
 		// reset the deserializer
 		entityDeserializer.reset();
 
 		// advance to the next entity
-		uint8_t const * nextEntity1 = std::search(stream.bytes, stream.bytesEnd,
-			searchFor1, searchFor1 + 3);
-		uint8_t const * nextEntity2 = std::search(stream.bytes, stream.bytesEnd,
-			searchFor2, searchFor2 + 3);
-
-		if (nextEntity1 == stream.bytesEnd &&
-			nextEntity2 == stream.bytesEnd) break;
-
-		// advance to the closest next entity
-		if (nextEntity1 - stream.bytes < nextEntity2 - stream.bytes)
-			advance(stream, nextEntity1 - stream.bytes);
-		else
-			advance(stream, nextEntity2 - stream.bytes);
-
+		if (!EntitiesPacketHandler::nextEntity(stream))
+			break;
+		
 		// deserialize it
 		entityDeserializer.deserialize(stream);
 
 		// if we got a BasePlayer from it, print out the stats
-		if (entityDeserializer.baseNetworkable.hasSerialized() &&
-			entityDeserializer.basePlayer.hasSerialized()) {
-
+		if (entityDeserializer.baseNetworkable.wasSuccessful() &&
+			entityDeserializer.basePlayer.wasSuccessful() &&
+			entityDeserializer.wasSuccessful()) {
 
 			updateEntity(entityDeserializer);
 		}
@@ -105,6 +95,19 @@ void EntitiesPacketHandler::updateEntity(const deserialize::Entity& entityDeseri
 	}
 }
 
+
+bool EntitiesPacketHandler::nextEntity(Stream& stream) {
+
+	while (stream.bytes - stream.bytesStart < stream.len - 4) {
+
+		if (stream.bytes[0] == 0x0a && stream.bytes[2] == 0x08)
+			return true;
+
+		advance(stream, 1);
+	}
+
+	return false;
+}
 
 bool EntitiesPacketHandler::isEntitiesPacket(uint8_t* param, const pcap_pkthdr* header,
 	const uint8_t* pkt_data) {

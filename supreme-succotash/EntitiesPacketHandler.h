@@ -27,6 +27,8 @@ public:
 	void updateEntity(const deserialize::Entity& entityDeserializer);
 
 
+	static bool nextEntity(Stream& stream);
+
 	static bool isEntitiesPacket(uint8_t* param, const pcap_pkthdr* header,
 		const uint8_t* pkt_data);
 
